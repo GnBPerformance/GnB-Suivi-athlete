@@ -243,13 +243,15 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='13/11 · installation';
+var VERSION='13/11 · liens GitHub';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
 var THEME=stored('suivi_theme')==='light'?'light':'galaxie';
 function setTheme(t){THEME=t==='light'?'light':'galaxie'; document.documentElement.setAttribute('data-theme',THEME); store('suivi_theme',THEME==='light'?'light':null)}
 document.documentElement.setAttribute('data-theme',THEME);
 // paramètres de la page : remplis par Google (ancien lien) ; sur GitHub Pages la balise reste brute, donc {} par défaut
 var PARAMS=(function(){try{return JSON.parse(document.getElementById('params').textContent||'{}')}catch(e){return {}}})();
+// lien personnel « ?a=…&k=… » (colonne Lien app) : le code est lu dans l'adresse puis effacé de la barre
+var CODE_LIEN=(function(){try{var q=new URLSearchParams(location.search); var c=(q.get('c')||q.get('k')||'').trim(); if(c&&history.replaceState)history.replaceState(null,'',location.pathname+location.hash); return c}catch(e){return ''}})();
 // adresse du script Google (/exec) : l'app hébergée sur GitHub Pages l'appelle par Internet pour lire et écrire le Sheet
 var API_URL='https://script.google.com/macros/s/AKfycbzR8cWBIn5BCHMCEqDE0JDQyL_Ey3k1EHJIznIHYC6NzOUQHnQvBo7R6wKghTwFsUpLKw/exec';
 var CHEZ_GOOGLE=!!(window.google&&google.script&&google.script.run);
@@ -745,7 +747,8 @@ function saveW(){
 }
 
 // ---------- démarrage
-if(PARAMS.c){loadCoach()}
+if(CODE_LIEN){doLogin(CODE_LIEN,stored('suivi_code')===CODE_LIEN)}
+else if(PARAMS.c){loadCoach()}
 else if(PARAMS.a&&PARAMS.k){call('getAthleteData',[PARAMS.a,PARAMS.k]).then(function(d){setAth(d); S.mode='athlete'; render()}).catch(function(e){S.mode='error'; S.error=errMsg(e); render()})}
 else {var sc=stored('suivi_code'); if(sc){doLogin(sc,true)} else {S.mode='login'; render()}}
 })();

@@ -230,6 +230,7 @@ details.mois details.prog{background:var(--bg)}
 .meso{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 0 11px 10px; border-bottom:1px solid var(--line); border-left:4px solid var(--line)}
 .meso:last-child{border-bottom:none}
 .dots{letter-spacing:2px; color:var(--link)} .dots span{color:var(--line)}
+.card.install{border:1px solid var(--accent); background:var(--ok-bg); color:var(--ink)}
 .outil{display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,auto); gap:12px; align-items:center}
 @media (max-width:620px){.outil{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
@@ -242,7 +243,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='13/11 · sécurité';
+var VERSION='13/11 · installation';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
 var THEME=stored('suivi_theme')==='light'?'light':'galaxie';
 function setTheme(t){THEME=t==='light'?'light':'galaxie'; document.documentElement.setAttribute('data-theme',THEME); store('suivi_theme',THEME==='light'?'light':null)}
@@ -386,12 +387,26 @@ function athProgramme(){
    '<p class="tiny muted">Les vidéos servent à te rappeler les exercices : suis d\'abord les consignes de ton préparateur.</p></div>';
 }
 function myMetrics(){return metrics(S.mySeances,S.myWellness,today())}
+// ---------- installation sur l'écran d'accueil : seule façon d'avoir l'app en plein écran, sans barre du navigateur
+var INSTALL={prompt:null};
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault(); INSTALL.prompt=e; render()});   // Android / Chrome / Edge
+window.addEventListener('appinstalled',function(){INSTALL.prompt=null; store('suivi_install_masque',String(Date.now())); render()});
+function estInstallee(){return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true}
+function bandeauInstall(){
+  if(CHEZ_GOOGLE||estInstallee())return '';
+  var masque=+(stored('suivi_install_masque')||0); if(masque&&Date.now()-masque<3*86400000)return '';   // « Plus tard » : revient dans 3 jours
+  var ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var action=INSTALL.prompt?'<button class="btn primary" data-act="installer" style="height:40px">Installer</button>'
+    :'<div class="small">'+(ios?'Touche <b>Partager</b> ⬆︎ en bas de Safari, puis <b>« Sur l\'écran d\'accueil »</b>.':'Menu <b>⋮</b> du navigateur, puis <b>« Installer l\'application »</b> ou <b>« Ajouter à l\'écran d\'accueil »</b>.')+'</div>';
+  return '<div class="card install stack" style="gap:10px"><div><b>📲 Installe l\'app sur ton écran d\'accueil</b><div class="small muted">Elle s\'ouvre en plein écran, sans barre du navigateur, et plus vite.</div></div>'+
+    '<div class="row" style="gap:10px;flex-wrap:wrap;align-items:center">'+action+'<button class="btn ghost" data-act="installPlusTard" style="height:40px">Plus tard</button></div></div>';
+}
 function athHome(){
   var ref=today(), m=myMetrics(), w=S.myWellness.filter(function(x){return x.date===key(ref)})[0], ws=w?wscore(w):null;
   var lastS=S.mySeances.filter(function(s){return s.date<=key(ref)}).sort(function(a,b){return a.date<b.date?1:-1})[0];
   var nextP=progSorted().fut[0], tl=tuilesAthlete(m);
   var nb=S.mySeances.filter(function(s){var d=parseKey(s.date); return d&&diffDays(ref,d)>=0&&diffDays(ref,d)<7}).length;
-  return '<div class="wrap stack">'+
+  return '<div class="wrap stack">'+bandeauInstall()+
   '<div class="stack" style="gap:4px"><div class="row between" style="align-items:center"><span class="small muted">'+esc(fmtLong(ref))+'</span><button class="btn ghost" data-act="logout" style="padding:5px 10px;font-size:12px;white-space:nowrap">Se déconnecter</button></div>'+
   '<div class="row between" style="align-items:center"><h1 class="title">Bonjour '+esc(S.profile.prenom)+'</h1><div class="avatar blue" aria-hidden="true">'+esc(initials(S.profile.prenom))+'</div></div></div>'+
   homeWellness(ws)+
@@ -549,7 +564,7 @@ function coachView(){
   var alerts=rows.filter(function(r){return r.m.sc==='Alerte'||r.m.sw==='Alerte'}).length;
   var wdone=rows.length?Math.round(100*rows.filter(function(r){return r.m.wt!=null}).length/rows.length):0;
   var sel=S.selected?rows.filter(function(r){return r.id===S.selected})[0]:null;
-  return '<div class="wrap wide">'+
+  return '<div class="wrap wide">'+bandeauInstall()+
   '<div class="coachhead"><div class="row between" style="flex-wrap:wrap"><div><div class="small" style="color:var(--hl)">Espace préparateur</div><h1 class="title" style="color:var(--on-block)">Vue d\'ensemble</h1></div>'+
   '<div class="row"><span class="small" style="color:var(--on-block-muted)">'+esc(fmtLong(ref))+'</span>'+(alerts?'<span class="pill s-alert">'+alerts+' alerte'+(alerts>1?'s':'')+'</span>':'')+'</div></div>'+
   '<div class="kpis"><div class="kpi"><b>'+rows.length+'</b><span class="tiny" style="color:var(--on-block-muted)">Athlètes</span></div><div class="kpi"><b>'+wdone+' %</b><span class="tiny" style="color:var(--on-block-muted)">Wellness remplis</span></div><div class="kpi"><b>'+rows.filter(function(r){return r.m.since!=null&&r.m.since>3}).length+'</b><span class="tiny" style="color:var(--on-block-muted)">Sans saisie depuis 3 j+</span></div></div></div>'+
@@ -619,7 +634,7 @@ function wellnessCard(r){
     :'<p class="small muted" style="margin:0">Aucun questionnaire rempli pour l\'instant.</p>')+'</div>';
 }
 function loginView(){
-  return '<div class="wrap stack" style="max-width:420px;padding-top:48px"><div class="avatar blue" aria-hidden="true" style="width:56px;height:56px;border-radius:28px;font-size:22px">S</div>'+
+  return '<div class="wrap stack" style="max-width:420px;padding-top:48px">'+bandeauInstall()+'<div class="avatar blue" aria-hidden="true" style="width:56px;height:56px;border-radius:28px;font-size:22px">S</div>'+
   '<h1 class="title">Suivi athlètes</h1><p class="muted" style="margin:0">Entre le code d\'accès que t\'a donné ton préparateur. Il sera mémorisé sur cet appareil.</p>'+
   '<div><label class="lab" for="lg-code">Code d\'accès</label><input id="lg-code" class="field" autocomplete="off" autocapitalize="none" spellcheck="false" value="'+esc(S.lg||'')+'"></div>'+
   (S.error?'<div class="notice">'+esc(S.error)+'</div>':'')+
@@ -700,6 +715,8 @@ app.addEventListener('click',function(e){
   else if(a==='saveW')saveW();
   else if(a==='zoom')zoomPhoto(v);
   else if(a==='theme'){setTheme(v); render()}
+  else if(a==='installer'){if(INSTALL.prompt){var pr=INSTALL.prompt; INSTALL.prompt=null; pr.prompt(); pr.userChoice.then(function(){render()}).catch(function(){})}}
+  else if(a==='installPlusTard'){store('suivi_install_masque',String(Date.now())); render()}
   else if(a==='outil'){var ov={}; ov[b.getAttribute('data-k')]=v; majOutils(b.getAttribute('data-a'),ov)}
   else if(a==='outilsBase'){var ob={}; ((S.roster&&S.roster.catalogue)||[]).forEach(function(t){ob[t.id]=''}); majOutils(b.getAttribute('data-a'),ob)}
 });

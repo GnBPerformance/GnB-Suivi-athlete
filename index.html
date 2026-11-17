@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="fr" data-theme="gnb">
+<html lang="fr" data-theme="gnb" data-style="bento">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>GnB Performance</title>
-<script>try{var t0=localStorage.getItem('suivi_theme');if(t0==='light'||t0==='galaxie')document.documentElement.setAttribute('data-theme',t0)}catch(e){}</script>
+<script>try{var t0=localStorage.getItem('suivi_theme');if(t0==='light'||t0==='galaxie')document.documentElement.setAttribute('data-theme',t0);if(localStorage.getItem('suivi_style')==='classique')document.documentElement.setAttribute('data-style','classique')}catch(e){}</script>
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 :root{
   --bg:#F2F3EF; --surface:#FFFFFF; --line:#E1E3DC; --ink:#15181D; --muted:#5B616B;
@@ -116,12 +116,51 @@
 .marque-login b{font-weight:800; font-style:italic; font-size:44px; line-height:1; color:var(--ink)}
 .marque-login span{font-weight:700; font-size:13px; letter-spacing:3px; text-transform:uppercase; color:var(--accent)}
 /* ---------- vue préparateur : barre d'actions (trois boutons égaux, jamais hors de l'écran) et outils actifs */
-.actions-coach{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:14px}
+.actions-coach{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:14px}
 .actions-coach .btn{height:44px; padding:0 8px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 @media (min-width:720px){.actions-coach{display:flex; justify-content:flex-end}.actions-coach .btn{padding:0 16px; font-size:14px}}
 .actif{display:flex; justify-content:space-between; align-items:center; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--line)}
 .actif:last-of-type{border-bottom:none}
 .actif .attente{color:var(--f-warn)}
+/* ---------- style « Bento » (17/11/2026, choisi par lui parmi 8 propositions) : tuiles serrées aux coins nets, sans contour,
+   titres et chiffres en lettres étroites sportives (Barlow Condensed), aplats sans dégradé ni halo.
+   Le style d'avant (« Classique » : grandes cartes arrondies) reste disponible : data-style="classique" sur <html>,
+   choisi dans Progrès > Style (athlète) ou par le bouton Style (préparateur). Pour revenir en arrière pour tout le monde :
+   mettre data-style="classique" par défaut dans la balise <html> et dans themeStyle(). */
+[data-style="bento"]{--display:'Barlow Condensed','Archivo','Helvetica Neue',Arial,sans-serif}
+[data-style="bento"] .card,[data-style="bento"] .item,[data-style="bento"] details.prog,[data-style="bento"] details.mois,[data-style="bento"] .tablebox{border:none; border-radius:8px}
+[data-style="bento"] .card{padding:14px}
+[data-style="bento"][data-theme="gnb"] .card,[data-style="bento"][data-theme="gnb"] .item,[data-style="bento"][data-theme="gnb"] details.prog,[data-style="bento"][data-theme="gnb"] details.mois,[data-style="bento"][data-theme="gnb"] .tablebox{background:#16161A}
+[data-style="bento"][data-theme="gnb"] .card details.prog{background:#1E1E23}
+[data-style="bento"] .card.accent,[data-style="bento"] .btn.primary{background:var(--accent); box-shadow:none}
+[data-style="bento"] .card.block,[data-style="bento"] .coachhead{border:none; border-radius:8px; background:var(--block)}
+[data-style="bento"][data-theme="gnb"] .card.block,[data-style="bento"][data-theme="gnb"] .coachhead{background:#16161A}
+[data-style="bento"] .card.forme{border-left:4px solid var(--f-na); border-radius:0 8px 8px 0}
+[data-style="bento"] .card.forme.f-ok{border-left-color:var(--f-ok)} [data-style="bento"] .card.forme.f-warn{border-left-color:var(--f-warn)} [data-style="bento"] .card.forme.f-alert{border-left-color:var(--f-alert)}
+/* les cartes mises en avant par un contour (retour, bilan du mois, reprise, installation) : un trait à gauche au lieu d'un cadre */
+[data-style="bento"] .card[style*="var(--accent)"],[data-style="bento"] .card.install{border:none!important; border-left:3px solid var(--accent)!important; border-radius:0 8px 8px 0}
+[data-style="bento"] .card[style*="var(--f-warn)"]{border:none!important; border-left:3px solid var(--f-warn)!important; border-radius:0 8px 8px 0}
+[data-style="bento"] .wrap.stack{gap:8px}
+[data-style="bento"] .two{gap:6px}
+[data-style="bento"] .sect{margin-top:18px}
+[data-style="bento"] .sect h2{font-size:24px; text-transform:uppercase; letter-spacing:.3px}
+[data-style="bento"] h1.title{text-transform:uppercase; font-size:34px; letter-spacing:.2px; line-height:1}
+[data-style="bento"] h3{font-weight:700; font-size:19px!important; letter-spacing:.2px}
+[data-style="bento"] .big{font-size:48px; letter-spacing:-.5px}
+[data-style="bento"] .btn{border-radius:8px; font-family:var(--body)}
+[data-style="bento"] .btn.ghost{border-color:#2A2A2E}
+[data-style="bento"] .num{border-radius:6px; font-size:19px}
+[data-style="bento"] .chip{border-radius:6px}
+[data-style="bento"] .field{border-radius:8px}
+[data-style="bento"] .seg{border-radius:8px} [data-style="bento"] .seg button{border-radius:6px}
+[data-style="bento"] .kpi{border-radius:6px} [data-style="bento"] .kpi b{font-size:30px}
+[data-style="bento"] .notice{border-radius:8px}
+[data-style="bento"] .avatar{border-radius:8px}
+[data-style="bento"] .bar{border-radius:2px}
+[data-style="bento"] .prog-bloc{border-radius:0 6px 6px 0}
+[data-style="bento"] .prog-ex .ph{border-radius:6px}
+[data-style="bento"] .toast{border-radius:8px}
+[data-style="bento"] .bars.sem .bar-col span,[data-style="bento"] .bar-col span{font-family:var(--body)}
 /* ---------- l'écran ne glisse jamais sur le côté : seuls les tableaux défilent, à l'intérieur de leur cadre */
 /* « clip » et non « hidden » : hidden casserait le bandeau fixe du haut (position sticky) */
 html,body{overflow-x:clip; max-width:100%}
@@ -323,12 +362,17 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='17/11 · GnB';
+var VERSION='17/11 · Bento';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
 // thème par appareil : GnB (noir, rouge, blanc, par défaut depuis le 17/11/2026), Clair ou Galaxie
 function themeValide(t){return t==='light'||t==='galaxie'?t:'gnb'}
 var THEME=themeValide(stored('suivi_theme'));
 function setTheme(t){THEME=themeValide(t); document.documentElement.setAttribute('data-theme',THEME); store('suivi_theme',THEME==='gnb'?null:THEME)}
+// style des cartes, par appareil : Bento (par défaut depuis le 17/11/2026) ou Classique (le style d'avant, gardé pour pouvoir revenir en arrière)
+function themeStyle(s){return s==='classique'?'classique':'bento'}
+var STYLE=themeStyle(stored('suivi_style'));
+function setStyle(s){STYLE=themeStyle(s); document.documentElement.setAttribute('data-style',STYLE); store('suivi_style',STYLE==='bento'?null:STYLE)}
+document.documentElement.setAttribute('data-style',STYLE);
 document.documentElement.setAttribute('data-theme',THEME);
 // paramètres de la page : remplis par Google (ancien lien) ; sur GitHub Pages la balise reste brute, donc {} par défaut
 var PARAMS=(function(){try{return JSON.parse(document.getElementById('params').textContent||'{}')}catch(e){return {}}})();
@@ -341,7 +385,11 @@ var CHEZ_GOOGLE=!!(window.google&&google.script&&google.script.run);
 if(!CHEZ_GOOGLE){
   [['manifest','manifest.webmanifest'],['apple-touch-icon','icon-192.png'],['icon','icon-192.png']].forEach(function(x){var l=document.createElement('link'); l.rel=x[0]; l.href=x[1]; document.head.appendChild(l)});
   var mt=document.createElement('meta'); mt.name='theme-color'; mt.content='#0A0A0B'; document.head.appendChild(mt);
-  if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+  if('serviceWorker' in navigator){
+    // nouvelle version de la mémoire du téléphone (sw.js) installée pendant l'ouverture : on recharge une fois, pour afficher tout de suite la version à jour
+    var avaitUnSW=!!navigator.serviceWorker.controller, recharge=false;
+    navigator.serviceWorker.addEventListener('controllerchange',function(){if(avaitUnSW&&!recharge){recharge=true; location.reload()}});
+    window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(function(){})})}
 }
 var S={mode:'loading',tab:'home',profile:null,mySeances:[],myWellness:[],roster:null,accounts:[],selected:null,
   form:{type:'Entraînement club',rpe:6,duree:60,date:null,comment:'',intitule:''},
@@ -821,6 +869,7 @@ function athProgress(){
   return '<div class="wrap stack"><h1 class="title">'+(S.invite?'Progrès':'Mes progrès')+'</h1>'+
   (S.invite?'':'<div class="seg"><button data-act="ptab" data-v="charge" aria-pressed="'+(S.progTab==='charge')+'">Charge</button><button data-act="ptab" data-v="wellness" aria-pressed="'+(S.progTab==='wellness')+'">Wellness</button></div>')+chart+
   '<div class="card row between" style="padding:12px 14px;flex-wrap:wrap"><span class="small" style="font-weight:600">Apparence</span><div class="seg" style="min-width:230px;flex:1">'+['gnb','light','galaxie'].map(function(t){return '<button data-act="theme" data-v="'+t+'" aria-pressed="'+(THEME===t)+'">'+nomTheme(t)+'</button>'}).join('')+'</div></div>'+
+  '<div class="card row between" style="padding:12px 14px;flex-wrap:wrap"><span class="small" style="font-weight:600">Style</span><div class="seg" style="min-width:230px;flex:1">'+[['bento','Bento'],['classique','Classique']].map(function(x){return '<button data-act="style" data-v="'+x[0]+'" aria-pressed="'+(STYLE===x[0])+'">'+x[1]+'</button>'}).join('')+'</div></div>'+
   '<div class="row" style="gap:10px;align-items:center"><span class="tiny muted">Version '+VERSION+(S.chrono?' · page '+(S.chrono.page/1000).toFixed(1)+' s · données '+(S.chrono.total/1000).toFixed(1)+' s (Sheet '+(S.chrono.serveur/1000).toFixed(1)+' s'+(S.chrono.memoire==null?'':', mémoire : '+(S.chrono.memoire?'oui':'non'))+')'+
     (S.chrono.etapes?' · '+Object.keys(S.chrono.etapes).map(function(k){return k+' '+(S.chrono.etapes[k]/1000).toFixed(1)}).join(' / '):''):'')+'</span></div><h3 style="font-size:17px">Dernières séances</h3><div class="list">'+(recent.length?recent.map(function(s){var plus=(voit('ressenti')||voit('rpe2'))?plusSeance(s):'', vid=lienVideo(s), nv=s.id&&s.retour&&!lus[cleRetour(s)];
       return '<div class="item" style="flex-wrap:wrap"><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(s.intitule||s.type)+'</div><div class="tiny muted">'+esc(fmtDate(parseKey(s.date)))+' · '+esc(s.type)+' · '+esc(s.duree)+' min, RPE '+esc(s.rpe)+'</div>'+
@@ -862,7 +911,7 @@ function coachView(){
   '<div class="row"><span class="small" style="color:var(--on-block-muted)">'+esc(fmtLong(ref))+'</span>'+(alerts?'<span class="pill s-alert">'+alerts+' alerte'+(alerts>1?'s':'')+'</span>':'')+'</div></div>'+
   '<div class="kpis"><div class="kpi"><b>'+rows.length+'</b><span class="tiny" style="color:var(--on-block-muted)">Athlètes</span></div><div class="kpi"><b>'+wdone+' %</b><span class="tiny" style="color:var(--on-block-muted)">Wellness remplis</span></div><div class="kpi"><b>'+rows.filter(function(r){return r.m.since!=null&&r.m.since>3}).length+'</b><span class="tiny" style="color:var(--on-block-muted)">Sans saisie depuis 3 j+</span></div></div></div>'+
   // barre d'actions : trois boutons de même largeur, toujours dans l'écran (sur téléphone comme sur ordinateur)
-  '<div class="actions-coach"><button class="btn ghost blue" data-act="refresh">Actualiser</button><button class="btn ghost" data-act="theme" data-v="'+(THEME==='gnb'?'light':THEME==='light'?'galaxie':'gnb')+'">Thème : '+nomTheme(THEME)+'</button><button class="btn ghost" data-act="logout">Se déconnecter</button></div>'+
+  '<div class="actions-coach"><button class="btn ghost blue" data-act="refresh">Actualiser</button><button class="btn ghost" data-act="theme" data-v="'+(THEME==='gnb'?'light':THEME==='light'?'galaxie':'gnb')+'">Thème : '+nomTheme(THEME)+'</button><button class="btn ghost" data-act="style" data-v="'+(STYLE==='bento'?'classique':'bento')+'">Style : '+(STYLE==='bento'?'Bento':'Classique')+'</button><button class="btn ghost" data-act="logout">Se déconnecter</button></div>'+
   '<div class="sect"><h2 style="margin:0 0 12px">Athlètes</h2>'+
   (rows.length? '<div class="tablebox"><table><thead><tr><th>Athlète</th><th>Forme du jour</th><th>Sport</th><th style="text-align:right">Charge 7 j</th><th style="text-align:right">Variation</th><th style="text-align:right">Ratio A/C</th><th>Charge</th><th>Wellness</th><th>Dernière saisie</th></tr></thead><tbody>'+
     rows.map(function(r){var m=r.m; return '<tr class="click'+(S.selected===r.id?' on':'')+'" data-act="sel" data-v="'+esc(r.id)+'" tabindex="0"><td><b>'+esc(r.name)+'</b><div class="tiny muted">'+esc(r.id)+''+'</div></td><td class="small" style="white-space:nowrap">'+formeCase(r,ref)+'</td><td class="small">'+esc(r.sport)+'</td><td class="n blue-t" style="font-weight:700">'+fmtN(m.c7)+'</td><td class="n">'+(m.variation==null||outilDe(r.id,'variation')==='off'?'–':(m.variation>0?'+':'')+Math.round(m.variation*100)+' %')+'</td><td class="n">'+(m.ratio==null||outilDe(r.id,'acwr')==='off'?'–':m.ratio.toFixed(2))+'</td><td><span class="pill '+cls(m.sc)+'">'+esc(m.sc)+'</span></td><td><span class="pill '+cls(m.sw)+'">'+esc(m.sw)+'</span></td><td class="small">'+(m.last?esc(fmtDate(m.last))+' <span class="muted">(J-'+m.since+')</span>':'–')+'</td></tr>'}).join('')+
@@ -1219,6 +1268,7 @@ app.addEventListener('click',function(e){
   else if(a==='saveW')saveW();
   else if(a==='zoom')zoomPhoto(v);
   else if(a==='theme'){setTheme(v); render()}
+  else if(a==='style'){setStyle(v); render()}
   else if(a==='installer'){if(INSTALL.prompt){var pr=INSTALL.prompt; INSTALL.prompt=null; pr.prompt(); pr.userChoice.then(function(){render()}).catch(function(){})}}
   else if(a==='installPlusTard'){store('suivi_install_masque',String(Date.now())); render()}
   else if(a==='outil'){var ok2=b.getAttribute('data-k'), oa=b.getAttribute('data-a'), ot=((S.roster&&S.roster.catalogue)||[]).filter(function(t){return t.id===ok2})[0];

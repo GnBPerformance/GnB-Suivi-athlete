@@ -1,7 +1,7 @@
 // Garde l'app sur le téléphone : elle s'ouvre tout de suite, même avec un réseau lent ou sans réseau.
 // Les données (appels au script Google qui lit et écrit le Sheet) ne passent JAMAIS par ce cache.
 // Après une mise à jour de l'app sur GitHub, la nouvelle version s'affiche à l'ouverture suivante.
-var CACHE = 'suivi-athletes-v1';
+var CACHE = 'suivi-athletes-v2';   // v2 (17/11/2026) : nouvelle icône et nouveau nom, tous les fichiers sont repris
 var FICHIERS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', function (e) {

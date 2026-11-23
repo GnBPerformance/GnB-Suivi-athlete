@@ -354,6 +354,11 @@ details.mois details.prog{background:var(--bg)}
 .fr-dates>div.cur{color:var(--link); font-weight:700}
 .sem-row{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line)}
 .sem-row:last-child{border-bottom:none}
+.pg-wrap{position:relative; padding:3px 0} .pg-barre{display:flex; gap:2px; height:14px; border-radius:7px; overflow:hidden}
+.pg-barre span{display:block; height:100%; min-width:2px} .pg-auj{position:absolute; top:0; bottom:0; width:3px; border-radius:2px; background:var(--ink); transform:translateX(-1px)}
+.pg-marques{position:relative; height:12px} .pg-marques i{position:absolute; top:0; transform:translateX(-50%); font-style:normal; font-size:10px; line-height:1; color:#E24B4A}
+.pg-bloc{border-top:1px solid var(--line); padding-top:10px} .pg-sous{padding:6px 0 0 18px; font-size:14px} .pg-ech b{color:#E24B4A}
+.carte-ech{gap:4px; text-align:left; width:100%; border:0; cursor:pointer; font:inherit; font-size:15px}
 .sem-row .barre{width:4px; align-self:stretch; border-radius:2px; flex:none}
 .meso{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 0 11px 10px; border-bottom:1px solid var(--line); border-left:4px solid var(--line)}
 .meso:last-child{border-bottom:none}
@@ -390,7 +395,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='23/11 · échéances 2';
+var VERSION='23/11 · plan général';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
 // thème par appareil : GnB (noir, rouge, blanc, par défaut depuis le 17/11/2026), Clair ou Galaxie
 function themeValide(t){return t==='light'||t==='galaxie'?t:'gnb'}
@@ -587,7 +592,7 @@ function athHome(){
   '<div class="row between" style="align-items:center"><h1 class="title">'+(S.invite?'Suivi de ':'Bonjour ')+esc(S.profile.prenom)+'</h1><div class="avatar blue" aria-hidden="true">'+esc(initials(S.profile.prenom))+'</div></div></div>'+
   (STYLE==='anneaux'?sur('Anneaux',function(){return anneauxCard(m)}):'')+
   (S.invite?'<div class="card small" style="border:1px solid var(--accent)"><b>Accès en lecture seule.</b> Tu vois le programme, la planification, la charge d\'entraînement et les objectifs de '+esc(S.profile.prenom)+'. Les questionnaires de bien-être et les données de santé ne sont pas affichés ici.</div>':homeWellness(ws))+
-  sur('Reprise',homeReprise)+sur('Retour du préparateur',homeRetour)+sur('Bilan du mois',homeMensuel)+sur('Objectifs',homeObjectifs)+
+  sur('Échéances',homeEcheances)+sur('Reprise',homeReprise)+sur('Retour du préparateur',homeRetour)+sur('Bilan du mois',homeMensuel)+sur('Objectifs',homeObjectifs)+
   '<div class="card stack" style="gap:14px"><div class="row between"><h3 style="font-size:17px">Ma semaine</h3><span class="small muted">'+nb+' séance'+(nb>1?'s':'')+'</span></div>'+
   '<div class="row" style="gap:6px;align-items:baseline"><span class="big blue-t">'+fmtN(m.c7)+'</span><span class="small muted">UA sur 7 jours</span></div>'+
   bars(m.d7,52,function(x){return DL[x.d.getDay()]},function(){return ''})+'</div>'+
@@ -696,7 +701,8 @@ function bgType(t){var e=bpE('type',t); return e&&coulOk(e.bg)?'background:'+e.b
 function stType(t){var e=bpE('type',t); return e&&coulOk(e.bg)?' style="background:'+e.bg+(coulOk(e.fg)?';color:'+e.fg:'')+'"':''}
 function initType(t){var e=bpE('type',t); return e&&e.i?String(e.i).slice(0,3):(INIT_T[cleType(t)]||(t?String(t).charAt(0).toUpperCase():''))}
 function stMac(t){var e=bpE('macro',t); return e&&coulOk(e.bg)?'background:'+e.bg+(coulOk(e.fg)?';color:'+e.fg:''):''}
-function stStage(t){var e=bpE('stage',t); return e&&coulOk(e.bg)?'background:'+e.bg+';'+(coulOk(e.fg)?'color:'+e.fg+';':''):'background:var(--line);color:var(--ink);'}
+// échéances (compétition, test, stage… écrits par le préparateur) : toutes en rouge, comme dans le Sheet
+function stStage(){return 'background:#E24B4A;color:#fff;'}
 function coulMeso(meso,macro){var e=bpE('meso',meso); if(e&&coulOk(e.bg))return e.bg; var m=bpE('macro',macro); return m&&coulOk(m.bg)?m.bg:'var(--mac-'+cleMacro(macro)+'-fg)'}
 function suites(w,k){var o=[]; w.forEach(function(s,i){var v=s[k]||'', l=o[o.length-1]; if(l&&l.v===v)l.fin=i; else o.push({v:v,deb:i,fin:i})}); return o}
 // UA réellement faites par semaine (clé = lundi), à partir des séances déjà reçues (Sheet + app) : aucun appel en plus
@@ -719,7 +725,7 @@ function athSaison(){
     (c.charge?'<div class="row between small"><span class="muted">Charge prévue</span><span class="dots">'+'●'.repeat(Math.min(5,c.charge))+'<span>'+'●'.repeat(Math.max(0,5-c.charge))+'</span></span></div>':'')+
     (c.seances?'<div class="row between small"><span class="muted">Séances prévues</span><b>'+c.seances+'</b></div>':'')+
     (ci>=0?'<div class="row between small"><span class="muted">Déjà fait cette semaine</span><b>'+fmtN(uaParSemaine()[c.lundi]||0)+' UA</b></div>':'')+
-    (c.stage&&ci>=0?'<div class="notice" style="'+stStage(c.stage)+'"><b>'+esc(c.stage)+'</b> cette semaine'+(bpE('stage',c.stage)&&bpE('stage',c.stage).d?'<br>'+esc(bpE('stage',c.stage).d):'')+'</div>':'')+
+    (c.stage&&ci>=0?'<div class="notice" style="'+stStage(c.stage)+'"><b>'+esc(c.stage)+'</b> cette semaine</div>':'')+
     (ns>=0?'<div class="notice" style="'+stStage(w[ns].stage)+'">'+esc(w[ns].stage)+' · '+dansSem(Math.round(diffDays(parseKey(w[ns].lundi),lun)/7))+' (semaine du '+fmtDate(parseKey(w[ns].lundi))+')</div>':'')+
     (c.note&&!fini?'<div class="notice" style="background:var(--ok-bg);color:var(--ok-fg)"><b>Note de ton préparateur</b><br>'+esc(c.note)+'</div>':'')+'</div>';
   // frise façon « plan annuel » : mois, macrocycles, mésocycles, puis une colonne par semaine :
@@ -738,10 +744,10 @@ function athSaison(){
       var corps=fait?'<span class="ua">'+uaCourt(ua)+'</span><div class="b mt-'+k+'" style="'+bgType(s.type)+'height:'+(ua?8+Math.round(ua/uaMax*54):3)+'px"></div>'
                     :'<div class="t mt-'+k+'"'+stType(s.type)+'>'+esc(initType(s.type))+'</div>';
       return '<div class="'+(i===ci?'cur':'')+'" title="'+esc('S'+(s.n||i+1)+' · '+fmtDate(parseKey(s.lundi))+(s.type?' · '+s.type:'')+(fait?' · '+fmtN(ua)+' UA faites':'')+(s.stage?' · '+s.stage:''))+'">'+
-        (i===ci?'<span class="auj">auj.</span>':'')+(s.stage&&(i===0||w[i-1].stage!==s.stage)?'<span class="f">▲</span>':'')+corps+'</div>'}).join('')+'</div>'+
+        (i===ci?'<span class="auj">auj.</span>':'')+(s.stage&&(i===0||w[i-1].stage!==s.stage)?'<span class="f" style="color:#E24B4A">▲</span>':'')+corps+'</div>'}).join('')+'</div>'+
     '<div class="fr-ligne fr-dates">'+w.map(function(s,i){return '<div'+(i===ci?' class="cur"':'')+'><b>S'+(s.n||i+1)+'</b><br>'+fmtDate(parseKey(s.lundi))+'</div>'}).join('')+'</div>'+
     '</div></div>'+
-    '<div class="legend" style="margin-top:12px">'+w.map(function(s){return s.type}).filter(function(x,i,a){return x&&a.indexOf(x)===i}).map(function(x){return '<span><span class="dot mt-'+cleType(x)+'" style="'+bgType(x)+'"></span>'+esc(initType(x))+' · '+esc(x)+'</span>'}).join('')+w.map(function(s){return s.stage}).filter(function(x,i,a){return x&&a.indexOf(x)===i}).map(function(x){return '<span><span class="dot" style="'+stStage(x)+'"></span>'+esc(x)+'</span>'}).join('')+(w.some(function(s){return s.stage})?'<span><span style="color:var(--alert-bg)">▲</span> début d\'une échéance</span>':'')+'</div>'+
+    '<div class="legend" style="margin-top:12px">'+w.map(function(s){return s.type}).filter(function(x,i,a){return x&&a.indexOf(x)===i}).map(function(x){return '<span><span class="dot mt-'+cleType(x)+'" style="'+bgType(x)+'"></span>'+esc(initType(x))+' · '+esc(x)+'</span>'}).join('')+(w.some(function(s){return s.stage})?'<span><span class="dot" style="'+stStage()+'"></span>▲ échéance</span>':'')+'</div>'+
     '<p class="tiny muted" style="margin:8px 0 0">1 colonne = 1 semaine (S1 = 1re semaine, date de son lundi). Semaines passées : la barre montre les UA réellement faites. Semaines à venir : le type de semaine prévu. '+(w.length>9?'Glisse la frise pour tout voir.':'')+'</p></div>';
   // les prochaines semaines, en clair
   var dep=avant?0:fini?w.length:ci+1, pro=w.slice(dep,dep+4);
@@ -752,11 +758,29 @@ function athSaison(){
   var liste=mesos.length?'<div class="card" style="padding:4px 16px"><h3 style="font-size:16px;padding:12px 0 4px">Mes mésocycles</h3>'+mesos.map(function(r){var s=w[r.deb], st=avant?'À venir':fini||r.fin<ci?'Terminé':r.deb<=ci?'En cours':'À venir';
       return '<div class="meso" style="border-left-color:'+coulMeso(r.v,s.macro)+'"><div><div style="font-weight:600">'+esc(r.v)+'</div><div class="tiny muted">'+fmtDate(parseKey(s.lundi))+' → '+fmtDate(addDays(parseKey(w[r.fin].lundi),6))+((s.obj1||s.obj2)?' · '+esc([s.obj1,s.obj2].filter(function(x){return x}).join(', ')):'')+'</div></div>'+
         '<span class="pill '+(st==='En cours'?'s-ok':'s-na')+'">'+st+'</span></div>'}).join('')+'</div>':'';
+  var plan=sur('Plan général',function(){return planGeneral(w,ci,avant,fini)});
   var ech=suites(w,'stage').filter(function(r){return r.v});
-  var le=ech.length?'<div class="card" style="padding:4px 16px"><h3 style="font-size:16px;padding:12px 0 4px">Mes échéances</h3>'+ech.map(function(r){var s=w[r.deb], e=bpE('stage',r.v), passe=!avant&&(fini||r.fin<ci), enc=!avant&&!fini&&r.deb<=ci&&r.fin>=ci;
-      return '<div class="meso" style="border-left-color:'+(e&&coulOk(e.bg)?e.bg:'var(--line)')+'"><div><div style="font-weight:600">'+esc(r.v)+'</div><div class="tiny muted">'+fmtDate(parseKey(s.lundi))+' → '+fmtDate(addDays(parseKey(w[r.fin].lundi),6))+(e&&e.d?' · '+esc(e.d):'')+'</div></div><span class="pill '+(enc?'s-ok':passe?'s-na':'s-warn')+'">'+(enc?'En cours':passe?'Passé':dansSem(Math.round(diffDays(parseKey(s.lundi),lun)/7)))+'</span></div>'}).join('')+'</div>':'';
-  return '<div class="wrap stack"><div><div class="small muted">Du '+fmtDate(parseKey(w[0].lundi))+' au '+fmtDate(addDays(parseKey(w[w.length-1].lundi),6))+'</div><h1 class="title">Ma planification</h1></div>'+carte+proch+frise+le+liste+sur('Bilan de compétition',competCarte)+'</div>';
+  var le=ech.length?'<div class="card" style="padding:4px 16px"><h3 style="font-size:16px;padding:12px 0 4px">Mes échéances</h3>'+ech.map(function(r){var s=w[r.deb], passe=!avant&&(fini||r.fin<ci), enc=!avant&&!fini&&r.deb<=ci&&r.fin>=ci;
+      return '<div class="meso" style="border-left-color:#E24B4A"><div><div style="font-weight:600">'+esc(r.v)+'</div><div class="tiny muted">'+fmtDate(parseKey(s.lundi))+' → '+fmtDate(addDays(parseKey(w[r.fin].lundi),6))+'</div></div><span class="pill '+(enc?'s-ok':passe?'s-na':'s-warn')+'">'+(enc?'En cours':passe?'Passé':dansSem(Math.round(diffDays(parseKey(s.lundi),lun)/7)))+'</span></div>'}).join('')+'</div>':'';
+  return '<div class="wrap stack"><div><div class="small muted">Du '+fmtDate(parseKey(w[0].lundi))+' au '+fmtDate(addDays(parseKey(w[w.length-1].lundi),6))+'</div><h1 class="title">Ma planification</h1></div>'+carte+plan+proch+frise+le+liste+sur('Bilan de compétition',competCarte)+'</div>';
 }
+// vue générale de toute la planification, sans défilement : barre des macrocycles (aujourd'hui, ▲ échéances), puis chaque macrocycle avec ses mésocycles et ses échéances
+function planGeneral(w,ci,avant,fini){
+  var n=w.length, macs=suites(w,'macro'), ech=suites(w,'stage').filter(function(r){return r.v}), pct=function(a){return (a/n*100).toFixed(2)+'%'};
+  var coul=function(v){return v?stMac(v):'background:var(--line)'}, cls=function(v){return v?'mac-'+cleMacro(v):''};
+  var barre='<div class="pg-wrap"><div class="pg-barre">'+macs.map(function(r){return '<span class="'+cls(r.v)+'" style="width:'+pct(r.fin-r.deb+1)+';'+coul(r.v)+'" title="'+esc(r.v||'—')+'"></span>'}).join('')+'</div>'+(ci>=0?'<i class="pg-auj" style="left:'+pct(ci+0.5)+'"></i>':'')+'</div>'+
+    (ech.length?'<div class="pg-marques">'+ech.map(function(r){return '<i style="left:'+pct(r.deb+0.5)+'" title="'+esc(r.v)+'">▲</i>'}).join('')+'</div>':'');
+  var dates='<div class="row between tiny muted"><span>'+fmtDate(parseKey(w[0].lundi))+'</span>'+(ci>=0?'<span style="color:var(--accent);font-weight:700">▼ aujourd\'hui · semaine '+(ci+1)+'/'+n+'</span>':'')+'<span>'+fmtDate(addDays(parseKey(w[n-1].lundi),6))+'</span></div>';
+  var etat=function(a,b){return avant?'À venir':(fini||b<ci)?'Terminé':a<=ci?'En cours':'À venir'};
+  var per=function(a,b){return fmtDate(parseKey(w[a].lundi))+' → '+fmtDate(addDays(parseKey(w[b].lundi),6))};
+  var blocs=macs.map(function(r){
+    var mes=suites(w.slice(r.deb,r.fin+1),'meso').filter(function(x){return x.v}), ec=ech.filter(function(x){return x.deb>=r.deb&&x.deb<=r.fin});
+    if(!r.v&&!mes.length&&!ec.length)return '';
+    var s=etat(r.deb,r.fin), nb=r.fin-r.deb+1;
+    return '<div class="pg-bloc"><div class="row between" style="gap:8px;align-items:flex-start"><div style="min-width:0"><div style="font-weight:700"><span class="dot '+cls(r.v)+'" style="'+coul(r.v)+'"></span>'+esc(r.v||'Sans macrocycle')+'</div><div class="tiny muted">'+per(r.deb,r.fin)+' · '+nb+' semaine'+(nb>1?'s':'')+'</div></div><span class="pill '+(s==='En cours'?'s-ok':'s-na')+'">'+s+'</span></div>'+
+      mes.map(function(x){var a=r.deb+x.deb, b=r.deb+x.fin, s0=w[a]; return '<div class="pg-sous"><b>'+esc(x.v)+'</b><div class="tiny muted">'+per(a,b)+((s0.obj1||s0.obj2)?' · '+esc([s0.obj1,s0.obj2].filter(function(o){return o}).join(', ')):'')+'</div></div>'}).join('')+
+      ec.map(function(x){return '<div class="pg-sous pg-ech"><b>▲ '+esc(x.v)+'</b><div class="tiny muted">'+(x.fin>x.deb?per(x.deb,x.fin):'semaine du '+fmtDate(parseKey(w[x.deb].lundi)))+'</div></div>'}).join('')+'</div>'}).join('');
+  return '<div class="card stack" style="gap:10px"><div class="row between"><h3 style="font-size:16px">Plan général</h3><span class="tiny muted">'+n+' semaines</span></div>'+barre+dates+blocs+'</div>'}
 function athSeance(){
   var f=S.form, L=(num(f.duree)!=null)?num(f.duree)*f.rpe:null;
   return '<div class="wrap stack">'+
@@ -880,6 +904,16 @@ function cleRetour(s){return s.id+'|'+hacher(s.retour)}
 function retoursLus(){try{return JSON.parse(localStorage.getItem('suivi_retours_lus')||'{}')||{}}catch(e){return {}}}
 function marquerLu(c){var o=retoursLus(), garde={}; o[c]=1; S.mySeances.forEach(function(s){if(s.id&&s.retour&&o[cleRetour(s)])garde[cleRetour(s)]=1}); store('suivi_retours_lus',JSON.stringify(garde))}
 function retoursNouveaux(){var lus=retoursLus(); return S.mySeances.filter(function(s){return s.id&&s.retour&&!lus[cleRetour(s)]}).sort(function(a,b){return a.date<b.date?1:-1})}
+// échéances de la planification (écrites par le préparateur dans la Périodisation) : celle de la semaine et la prochaine, en rouge
+function homeEcheances(){
+  var w=(S.saison&&S.saison.semaines)||[]; if(!w.length)return '';
+  var t=today(), lunD=addDays(t,-((t.getDay()+6)%7)), lun=key(lunD), ci=-1; w.forEach(function(s,i){if(s.lundi===lun)ci=i});
+  var cur=ci>=0?w[ci].stage:'', nx=-1;
+  for(var j=0;j<w.length;j++){if(w[j].lundi<=lun)continue; if(w[j].stage&&(j===0||w[j-1].stage!==w[j].stage)){nx=j;break}}
+  if(!cur&&nx<0)return '';
+  return '<button class="card stack carte-ech" data-act="tab" data-v="saison" style="'+stStage()+'"><span class="tiny" style="font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.9">Échéances</span>'+
+    (cur?'<span><b>'+esc(cur)+'</b> cette semaine</span>':'')+
+    (nx>=0?'<span><b>'+esc(w[nx].stage)+'</b> · '+dansSem(Math.round(diffDays(parseKey(w[nx].lundi),lunD)/7))+' <span style="opacity:.85">(semaine du '+fmtDate(parseKey(w[nx].lundi))+')</span></span>':'')+'</button>'}
 function homeRetour(){var n=retoursNouveaux(); if(!n.length)return ''; var s=n[0];
   return '<div class="card stack" style="gap:8px;border:1px solid var(--accent)"><div class="row between" style="flex-wrap:wrap"><h3 style="font-size:17px">Retour de ton préparateur</h3><span class="pill s-ok">Nouveau'+(n.length>1?' · '+n.length:'')+'</span></div>'+
    '<div class="tiny muted">Séance du '+esc(fmtDate(parseKey(s.date)))+' · '+esc(s.intitule||s.type)+'</div><div class="small" style="white-space:pre-wrap">'+esc(s.retour)+'</div>'+
@@ -1217,21 +1251,25 @@ function loginView(){
 function store(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}}
 function stored(k){try{return localStorage.getItem(k)}catch(e){return null}}
 // dernière version reçue, gardée sur le téléphone : l'app s'affiche tout de suite, puis se met à jour en arrière-plan
-function garder(r){try{localStorage.setItem('suivi_data',JSON.stringify(r))}catch(e){try{localStorage.removeItem('suivi_data')}catch(e2){}}}
+function garder(r){try{localStorage.setItem('suivi_data',JSON.stringify(r))}catch(e){try{localStorage.removeItem('suivi_data')}catch(e2){}} garderCopie(r)}
+// une copie par code (4 au plus) : passer du code préparateur au lien d'un athlète sur le même téléphone s'affiche aussi tout de suite
+function copies(){try{return JSON.parse(localStorage.getItem('suivi_copies')||'{}')||{}}catch(e){return {}}}
+function garderCopie(r){if(!r||!r.code)return; try{var c=copies(); c[r.code]=r; var k=Object.keys(c); if(k.length>4)k.sort(function(a,b){return (c[a].t||0)-(c[b].t||0)}).slice(0,k.length-4).forEach(function(x){delete c[x]}); localStorage.setItem('suivi_copies',JSON.stringify(c))}catch(e){try{localStorage.removeItem('suivi_copies')}catch(e2){}}}
+function oublierCopie(code){try{var c=copies(); delete c[code]; localStorage.setItem('suivi_copies',JSON.stringify(c))}catch(e){}}
 function appliquer(r){if(r.role==='coach'){PARAMS.c=r.c; S.roster=r.data; S.mode='coach'} else {PARAMS.a=r.a; PARAMS.k=r.k; setAth(r.data); S.mode='athlete'}}
 function doLogin(code,silent){
   var dejaAffiche=false, brut=null;
-  if(silent){try{brut=localStorage.getItem('suivi_data'); var r0=brut&&JSON.parse(brut); if(r0&&r0.code===code){appliquer(r0); dejaAffiche=true; S.maj=true; render()}}catch(e){brut=null}}
+  if(silent){try{brut=localStorage.getItem('suivi_data'); var r0=brut&&JSON.parse(brut); if(!(r0&&r0.code===code)){r0=copies()[code]||null; brut=r0?JSON.stringify(r0):null} if(r0&&r0.code===code){appliquer(r0); dejaAffiche=true; S.maj=true; render()}}catch(e){brut=null}}
   if(!dejaAffiche){S.busy=true; S.error=null; render()}
   var t0=Date.now();
-  call('login',[code]).then(function(r){S.busy=false; S.maj=false; DERNIERE_SYNC=Date.now(); S.chrono={total:Date.now()-t0, serveur:r.ms||0, page:Math.round(performance.now()), memoire:r.memoire, etapes:r.etapes||null}; store('suivi_code',code); r.code=code;
-    var neuf=JSON.stringify(r); garder(r);
-    if(!dejaAffiche||neuf!==brut){appliquer(r); render()} else render()})
+  call('login',[code]).then(function(r){S.busy=false; S.maj=false; DERNIERE_SYNC=Date.now(); S.chrono={total:Date.now()-t0, serveur:r.ms||0, page:Math.round(performance.now()), memoire:r.memoire, etapes:r.etapes||null}; store('suivi_code',code); r.code=code; r.t=Date.now();
+    var neuf=JSON.stringify(r), ancien=null; try{ancien=brut&&JSON.parse(brut)}catch(e3){} if(ancien)ancien.t=r.t; garder(r);
+    if(!dejaAffiche||!ancien||neuf!==JSON.stringify(ancien)){appliquer(r); render()} else render()})
   .catch(function(e){S.busy=false; S.maj=false; var m=errMsg(e), refuse=/inconnu|invalide|expiré/i.test(m)&&!/Trop de codes/i.test(m);
     // blocage temporaire (trop de codes erronés) ou réseau absent : on garde la dernière version affichée, sans déconnecter
     if(dejaAffiche&&!refuse){render(); toast(/Trop de codes/i.test(m)?'Accès momentanément bloqué : affichage de la dernière version':'Pas de connexion : affichage de la dernière version'); return}
     // code refusé par le serveur : on l'oublie. Panne de réseau ou blocage : le code reste en mémoire, prêt pour un nouvel essai
-    if(refuse){store('suivi_code',null); try{localStorage.removeItem('suivi_data')}catch(e2){}} else S.lg=code;
+    if(refuse){store('suivi_code',null); oublierCopie(code); try{localStorage.removeItem('suivi_data')}catch(e2){}} else S.lg=code;
     S.mode='login'; S.error=m; render()});
 }
 // retour dans l'app après une pause (téléphone rallumé, app remise au premier plan) : mise à jour en arrière-plan si la dernière date de plus de 10 min
@@ -1320,7 +1358,7 @@ app.addEventListener('click',function(e){
   else if(a==='refresh'){loadCoach().then(function(ok){if(ok)toast('Données actualisées')})}
   else if(a==='saveSeance')saveSeance();
   else if(a==='login'){var v=(document.getElementById('lg-code')||{}).value||''; v=v.trim(); if(!v){toast('Entre ton code.');return} doLogin(v,false)}
-  else if(a==='logout'){store('suivi_code',null); try{localStorage.removeItem('suivi_data')}catch(e){}
+  else if(a==='logout'){store('suivi_code',null); try{localStorage.removeItem('suivi_data'); localStorage.removeItem('suivi_copies')}catch(e){}
     PARAMS={}; S.profile=null; S.mySeances=[]; S.myWellness=[]; S.programme=[]; S.roster=null; S.chrono=null; S.tab='home'; S.error=null; S.busy=false; S.mode='login';
     S.plus={}; S.invite=false; S.selected=null; S.retourEdit=null; S.lg=''; S.wform={}; S.mform={}; S.cform={}; S.form={type:'Entraînement club',rpe:6,duree:60,date:null,comment:'',intitule:''};   // rien ne reste de la personne précédente
     window.scrollTo(0,0); render(); toast('Déconnecté')}
@@ -1384,7 +1422,7 @@ function saveW(){
 }
 
 // ---------- démarrage
-if(CODE_LIEN){doLogin(CODE_LIEN,stored('suivi_code')===CODE_LIEN)}
+if(CODE_LIEN){doLogin(CODE_LIEN,true)}
 else if(PARAMS.c){loadCoach()}
 else if(PARAMS.a&&PARAMS.k){call('getAthleteData',[PARAMS.a,PARAMS.k]).then(function(d){setAth(d); S.mode='athlete'; render()}).catch(function(e){S.mode='error'; S.error=errMsg(e); render()})}
 else {var sc=stored('suivi_code'); if(sc){doLogin(sc,true)} else {S.mode='login'; render()}}

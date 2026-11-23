@@ -108,7 +108,7 @@
 .topbar{position:sticky; top:0; z-index:6; background:var(--bg); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px)}
 [data-theme="gnb"] .topbar{background:rgba(10,10,11,.94); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
 :is([data-theme="galaxie"]) .topbar{background:rgba(9,7,16,.9); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
-.topbar .in{max-width:1080px; margin:0 auto; height:66px; padding:0 20px; display:flex; align-items:center; justify-content:space-between; gap:12px}
+.topbar .in{max-width:1080px; margin:0 auto; height:82px; padding:0 20px; display:flex; align-items:center; justify-content:space-between; gap:12px}
 .topbar .role{font-size:12px; color:var(--muted); white-space:nowrap}
 .topbar .actu{background:none; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:5px 10px; font:inherit; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap} .topbar .actu:disabled{opacity:.6; cursor:default}
 /* ---------- vue préparateur : barre d'actions (trois boutons égaux, jamais hors de l'écran) et outils actifs */
@@ -192,21 +192,16 @@
    Sur fond sombre, mix-blend-mode:lighten fond le noir du logo dans le fond de l'app (pas de rectangle visible).
    Hors GitHub (ancien lien Google), --logo est remplacé par l'adresse complète du logo sur GitHub (voir CHEZ_GOOGLE). */
 :root{--logo:url("logo.webp"); --rouge-logo:#A51C24}
-.lg-tete,.lg-gnb,.lg-plein,[data-theme="gnb"] :is(.hero,.coachhead)::after{
+.lg-plein,[data-theme="gnb"] :is(.hero,.coachhead)::after{
   width:calc(var(--w) * var(--s) * 1px); height:calc(var(--h) * var(--s) * 1px);
   background:var(--logo) no-repeat; background-size:calc(1024px * var(--s)) auto;
   background-position:calc(var(--x) * var(--s) * -1px) calc(var(--y) * var(--s) * -1px); mix-blend-mode:lighten}
-.lg-tete,.lg-gnb,.lg-plein{display:block; flex:none}
-/* loup entier, crinière et cou compris (x 145-665, y 22-550). Les lettres GnB / PERFORMANCE du logo, en bas à droite du loup,
-   sont retirées par clip-path : tout ce qui est à droite de x 452 et sous y 318 dans l'image d'origine. */
-.lg-tete{--x:145; --y:22; --w:520; --h:528; --s:.11; clip-path:polygon(0 0,100% 0,100% 56.1%,59% 56.1%,59% 100%,0 100%)}
-.lg-gnb{--x:450; --y:322; --w:406; --h:114; --s:.22}      /* lettres GnB */
-.lg-plein{--x:140; --y:30; --w:720; --h:520; --s:.42}     /* logo entier */
+.lg-plein{display:block; flex:none; --x:140; --y:30; --w:720; --h:520; --s:.42}     /* logo entier */
 [data-theme="light"] .lg-plein{mix-blend-mode:normal; border-radius:12px}   /* thème clair : le logo garde son fond noir, en pastille */
-/* bandeau du haut : tête de loup + GnB + PERFORMANCE ; noir dans tous les thèmes */
-.marque{display:inline-flex; align-items:center; gap:5px; white-space:nowrap}
-.marque .lg-txt{display:flex; flex-direction:column; align-items:flex-start; gap:4px}
-.marque .lg-txt b{font-family:'Saira','Archivo',Arial,sans-serif; font-stretch:125%; font-weight:600; font-size:7.7px; line-height:1; letter-spacing:2.4px; text-transform:uppercase; color:#FFFFFF; padding-left:1px}
+/* bandeau du haut : SON LOGO EXACT (loup avec tout son cou, lettres posées dessus), demandé le 23/11/2026.
+   Ne pas recomposer loup / lettres côte à côte : les lettres couvrent le cou du loup, il l'a refusé. Bandeau noir dans tous les thèmes. */
+.marque{display:inline-flex; align-items:center}
+.marque .lg-plein{--s:.14; mix-blend-mode:lighten; border-radius:0}
 [data-theme="light"] .topbar{background:#0A0A0B; border-bottom-color:#0A0A0B}
 [data-theme="light"] .topbar .role{color:#B4B4BB}
 [data-theme="light"] .topbar .actu{color:#F4F4F5; border-color:#3F3F46}
@@ -475,7 +470,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='23/11 · titres sans loup';
+var VERSION='23/11 · logo exact';
 // version du script (Code.gs, VERSION_SERVEUR) dont cette page a besoin : à changer seulement quand Code.gs change
 var SCRIPT_MIN='23/11 · détail planif';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
@@ -590,7 +585,7 @@ var DL=['D','L','M','M','J','V','S'];
 
 // ---------- rendu athlète
 // bandeau du haut, fixe : le logo GnB Performance (tête de loup, lettres GnB du logo, PERFORMANCE)
-function topbar(){return '<header class="topbar"><div class="in"><span class="marque" role="img" aria-label="GnB Performance"><i class="lg-tete"></i><span class="lg-txt"><i class="lg-gnb"></i><b>Performance</b></span></span><span class="row" style="gap:8px;align-items:center">'+(S.mode==='coach'?(S.vs&&S.vs!==SCRIPT_MIN?'<span class="role" style="color:var(--alert-bg);font-weight:700">Script pas à jour</span>':'')+'<span class="role">Préparateur</span>':(S.invite?'<span class="role">Lecture seule</span>':'')+'<button class="actu" data-act="actu" aria-label="Actualiser"'+(S.maj?' disabled':'')+'>'+(S.maj?'Mise à jour…':'↻ Actualiser')+'</button>')+'</span></div></header>'}
+function topbar(){return '<header class="topbar"><div class="in"><span class="marque" role="img" aria-label="GnB Performance"><i class="lg-plein"></i></span><span class="row" style="gap:8px;align-items:center">'+(S.mode==='coach'?(S.vs&&S.vs!==SCRIPT_MIN?'<span class="role" style="color:var(--alert-bg);font-weight:700">Script pas à jour</span>':'')+'<span class="role">Préparateur</span>':(S.invite?'<span class="role">Lecture seule</span>':'')+'<button class="actu" data-act="actu" aria-label="Actualiser"'+(S.maj?' disabled':'')+'>'+(S.maj?'Mise à jour…':'↻ Actualiser')+'</button>')+'</span></div></header>'}
 function nomTheme(t){return t==='light'?'Clair':t==='galaxie'?'Galaxie':'GnB'}
 function athleteView(){
   var body= S.tab==='home'?athHome(): S.tab==='prog'?athProgramme(): S.tab==='saison'?athSaison(): S.tab==='seance'?athSeance(): S.tab==='wellness'?athWellness(): S.tab==='mensuel'?athMensuel(): S.tab==='compet'?athCompet(): athProgress();

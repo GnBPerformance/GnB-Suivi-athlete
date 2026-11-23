@@ -2,8 +2,9 @@
 // Les données (appels au script Google qui lit et écrit le Sheet) ne passent JAMAIS par ce cache.
 // Depuis la v3 (17/11/2026) : la page de l'app est TOUJOURS demandée d'abord à GitHub, une mise à jour se voit donc dès l'ouverture.
 // La copie du téléphone ne sert que sans réseau, ou si GitHub met plus de 3 secondes à répondre.
-var CACHE = 'suivi-athletes-v3';
-var FICHIERS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
+// v4 (23/11/2026) : logo ajouté, icônes refaites avec le logo.
+var CACHE = 'suivi-athletes-v4';
+var FICHIERS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'logo.webp'];
 var DELAI_RESEAU = 3000;
 
 self.addEventListener('install', function (e) {

@@ -192,7 +192,7 @@
    Sur fond sombre, mix-blend-mode:lighten fond le noir du logo dans le fond de l'app (pas de rectangle visible).
    Hors GitHub (ancien lien Google), --logo est remplacé par l'adresse complète du logo sur GitHub (voir CHEZ_GOOGLE). */
 :root{--logo:url("logo.webp"); --rouge-logo:#A51C24}
-.lg-tete,.lg-gnb,.lg-plein,[data-theme="gnb"] :is(.hero,.coachhead)::after,[data-theme="gnb"] .wrap.stack:not(.login) > h1.title::before,[data-theme="gnb"] .wrap.stack > div:not(.hero) > h1.title::before{
+.lg-tete,.lg-gnb,.lg-plein,[data-theme="gnb"] :is(.hero,.coachhead)::after{
   width:calc(var(--w) * var(--s) * 1px); height:calc(var(--h) * var(--s) * 1px);
   background:var(--logo) no-repeat; background-size:calc(1024px * var(--s)) auto;
   background-position:calc(var(--x) * var(--s) * -1px) calc(var(--y) * var(--s) * -1px); mix-blend-mode:lighten}
@@ -235,9 +235,6 @@
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 45%); mask-image:linear-gradient(90deg,transparent,#000 45%)}
 [data-theme="gnb"] .hero .avatar{display:none}
 [data-theme="gnb"] .hero .btn.ghost{background:rgba(10,10,11,.6)}
-/* titre des autres pages (Programme, Planif, Wellness, Progrès…) : petite tête de loup discrète à droite, derrière le texte */
-[data-theme="gnb"] .wrap.stack:not(.login) > h1.title,[data-theme="gnb"] .wrap.stack > div:not(.hero) > h1.title{position:relative}
-[data-theme="gnb"] .wrap.stack:not(.login) > h1.title::before,[data-theme="gnb"] .wrap.stack > div:not(.hero) > h1.title::before{--x:300; --y:22; --w:370; --h:300; --s:.135; content:""; position:absolute; right:0; bottom:2px; z-index:-1; pointer-events:none; opacity:.38}
 /* intertitres des pages (« Prochaine séance », « Toutes mes séances »…) : petit trait rouge incliné devant */
 [data-theme="gnb"] .wrap.stack > h3::before{content:""; display:inline-block; width:4px; height:.85em; margin-right:8px; background:#E1161E; transform:skewX(-20deg); vertical-align:-1px}
 /* signature en bas de l'onglet Progrès */
@@ -478,7 +475,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='23/11 · anneaux gris';
+var VERSION='23/11 · titres sans loup';
 // version du script (Code.gs, VERSION_SERVEUR) dont cette page a besoin : à changer seulement quand Code.gs change
 var SCRIPT_MIN='23/11 · détail planif';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)

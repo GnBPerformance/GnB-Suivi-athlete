@@ -108,7 +108,7 @@
 .topbar{position:sticky; top:0; z-index:6; background:var(--bg); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px)}
 [data-theme="gnb"] .topbar{background:rgba(10,10,11,.94); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
 :is([data-theme="galaxie"]) .topbar{background:rgba(9,7,16,.9); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
-.topbar .in{max-width:1080px; margin:0 auto; height:48px; padding:0 20px; display:flex; align-items:center; justify-content:space-between; gap:12px}
+.topbar .in{max-width:1080px; margin:0 auto; height:66px; padding:0 20px; display:flex; align-items:center; justify-content:space-between; gap:12px}
 .topbar .role{font-size:12px; color:var(--muted); white-space:nowrap}
 .topbar .actu{background:none; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:5px 10px; font:inherit; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap} .topbar .actu:disabled{opacity:.6; cursor:default}
 /* ---------- vue préparateur : barre d'actions (trois boutons égaux, jamais hors de l'écran) et outils actifs */
@@ -163,25 +163,26 @@
 [data-style="anneaux"] h1.title{font-weight:600; font-size:26px; letter-spacing:-.4px}
 [data-style="anneaux"] h3{font-weight:600}
 [data-style="anneaux"] .big,[data-style="anneaux"] .kpi b,[data-style="anneaux"] .anneau-c{font-family:'Barlow Condensed','Archivo',Arial,sans-serif; font-weight:800}
-[data-style="anneaux"] .card,[data-style="anneaux"] .item,[data-style="anneaux"] details.prog,[data-style="anneaux"] details.mois,[data-style="anneaux"] .card.block,[data-style="anneaux"] .coachhead{background:transparent!important; border:none!important; border-bottom:1px solid var(--line)!important; border-radius:0!important; box-shadow:none!important; padding-left:0; padding-right:0}
+/* 23/11/2026, à sa demande : chaque bloc garde la mise en page Anneaux mais sur un fond légèrement grisé (comme Bento), sans contour */
+[data-style="anneaux"]{--fond-anneaux:var(--surface); --fond-anneaux-2:var(--seg)}
+[data-style="anneaux"][data-theme="gnb"]{--fond-anneaux:#16161A; --fond-anneaux-2:#1E1E23}
+[data-style="anneaux"] .card,[data-style="anneaux"] .item,[data-style="anneaux"] details.prog,[data-style="anneaux"] details.mois,[data-style="anneaux"] .card.block,[data-style="anneaux"] .coachhead{background:var(--fond-anneaux)!important; border:none!important; border-radius:12px!important; box-shadow:none!important}
+[data-style="anneaux"] .card details.prog,[data-style="anneaux"] details.mois details.prog{background:var(--fond-anneaux-2)!important}
+[data-style="anneaux"] .card.carte-ech{background:#E24B4A!important; color:#FFFFFF}   /* carte des échéances : rouge, comme dans les autres styles */
 [data-style="anneaux"] .card.block,[data-style="anneaux"] .coachhead{color:var(--ink)}
 [data-style="anneaux"] .card.block .muted,[data-style="anneaux"] .coachhead .tiny,[data-style="anneaux"] .coachhead .small{color:var(--muted)!important}
 [data-style="anneaux"] .coachhead h1.title{color:var(--ink)!important}
-[data-style="anneaux"] details.prog summary,[data-style="anneaux"] details.mois > summary{padding-left:0; padding-right:0}
-[data-style="anneaux"] details.prog .body{padding-left:0; padding-right:0}
-[data-style="anneaux"] details.mois .mois-body{padding:0 0 8px}
-[data-style="anneaux"] details.prog[open] summary{border-bottom:none}
 [data-style="anneaux"] .card.accent{background:var(--accent)!important; border:none!important; border-radius:14px!important; padding:16px!important; color:var(--on-accent)}
-[data-style="anneaux"] .card.forme,[data-style="anneaux"] .card[style*="var(--accent)"],[data-style="anneaux"] .card[style*="var(--f-warn)"],[data-style="anneaux"] .card.install{border-left:3px solid var(--accent)!important; padding-left:12px!important}
+[data-style="anneaux"] .card.forme,[data-style="anneaux"] .card[style*="var(--accent)"],[data-style="anneaux"] .card[style*="var(--f-warn)"],[data-style="anneaux"] .card.install{border-left:3px solid var(--accent)!important; border-radius:0 12px 12px 0!important}
 [data-style="anneaux"] .card.forme.f-ok{border-left-color:var(--f-ok)!important} [data-style="anneaux"] .card.forme.f-warn,[data-style="anneaux"] .card[style*="var(--f-warn)"]{border-left-color:var(--f-warn)!important} [data-style="anneaux"] .card.forme.f-alert{border-left-color:var(--f-alert)!important}
-[data-style="anneaux"] .tablebox{border:none; border-top:1px solid var(--line); border-radius:0; background:transparent}
-[data-style="anneaux"] .wrap.stack{gap:4px}
+[data-style="anneaux"] .tablebox{border:none; border-radius:12px; background:var(--fond-anneaux)}
+[data-style="anneaux"] .wrap.stack{gap:8px}
 [data-style="anneaux"] .two{gap:16px}
 [data-style="anneaux"] .btn{border-radius:12px}
 [data-style="anneaux"] .num{border-radius:10px} [data-style="anneaux"] .seg{border-radius:10px}
 [data-style="anneaux"] .kpi{background:var(--seg); border-radius:12px}
 [data-style="anneaux"] .actif{border-bottom-color:var(--line)}
-.anneaux{display:flex; flex-direction:column; align-items:center; gap:10px; padding:8px 0 16px; border-bottom:1px solid var(--line)}
+.anneaux{display:flex; flex-direction:column; align-items:center; gap:10px; padding:16px 14px; background:var(--fond-anneaux,transparent); border-radius:12px}
 .anneaux svg{display:block}
 .anneaux .leg{display:flex; gap:16px; flex-wrap:wrap; justify-content:center; font-size:12px; color:var(--muted)}
 .anneaux .leg i{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:-1px}
@@ -196,14 +197,16 @@
   background:var(--logo) no-repeat; background-size:calc(1024px * var(--s)) auto;
   background-position:calc(var(--x) * var(--s) * -1px) calc(var(--y) * var(--s) * -1px); mix-blend-mode:lighten}
 .lg-tete,.lg-gnb,.lg-plein{display:block; flex:none}
-.lg-tete{--x:145; --y:22; --w:520; --h:302; --s:.1325}   /* loup entier (crinière comprise), coupé juste au-dessus des lettres */
-.lg-gnb{--x:450; --y:322; --w:406; --h:114; --s:.2}       /* lettres GnB */
+/* loup entier, crinière et cou compris (x 145-665, y 22-550). Les lettres GnB / PERFORMANCE du logo, en bas à droite du loup,
+   sont retirées par clip-path : tout ce qui est à droite de x 452 et sous y 318 dans l'image d'origine. */
+.lg-tete{--x:145; --y:22; --w:520; --h:528; --s:.11; clip-path:polygon(0 0,100% 0,100% 56.1%,59% 56.1%,59% 100%,0 100%)}
+.lg-gnb{--x:450; --y:322; --w:406; --h:114; --s:.22}      /* lettres GnB */
 .lg-plein{--x:140; --y:30; --w:720; --h:520; --s:.42}     /* logo entier */
 [data-theme="light"] .lg-plein{mix-blend-mode:normal; border-radius:12px}   /* thème clair : le logo garde son fond noir, en pastille */
 /* bandeau du haut : tête de loup + GnB + PERFORMANCE ; noir dans tous les thèmes */
 .marque{display:inline-flex; align-items:center; gap:5px; white-space:nowrap}
 .marque .lg-txt{display:flex; flex-direction:column; align-items:flex-start; gap:4px}
-.marque .lg-txt b{font-family:'Saira','Archivo',Arial,sans-serif; font-stretch:125%; font-weight:600; font-size:7px; line-height:1; letter-spacing:2.2px; text-transform:uppercase; color:#FFFFFF; padding-left:1px}
+.marque .lg-txt b{font-family:'Saira','Archivo',Arial,sans-serif; font-stretch:125%; font-weight:600; font-size:7.7px; line-height:1; letter-spacing:2.4px; text-transform:uppercase; color:#FFFFFF; padding-left:1px}
 [data-theme="light"] .topbar{background:#0A0A0B; border-bottom-color:#0A0A0B}
 [data-theme="light"] .topbar .role{color:#B4B4BB}
 [data-theme="light"] .topbar .actu{color:#F4F4F5; border-color:#3F3F46}
@@ -232,7 +235,6 @@
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 45%); mask-image:linear-gradient(90deg,transparent,#000 45%)}
 [data-theme="gnb"] .hero .avatar{display:none}
 [data-theme="gnb"] .hero .btn.ghost{background:rgba(10,10,11,.6)}
-[data-theme="gnb"][data-style="anneaux"] .hero{background:transparent; padding-left:0}
 /* titre des autres pages (Programme, Planif, Wellness, Progrès…) : petite tête de loup discrète à droite, derrière le texte */
 [data-theme="gnb"] .wrap.stack:not(.login) > h1.title,[data-theme="gnb"] .wrap.stack > div:not(.hero) > h1.title{position:relative}
 [data-theme="gnb"] .wrap.stack:not(.login) > h1.title::before,[data-theme="gnb"] .wrap.stack > div:not(.hero) > h1.title::before{--x:300; --y:22; --w:370; --h:300; --s:.135; content:""; position:absolute; right:0; bottom:2px; z-index:-1; pointer-events:none; opacity:.38}
@@ -476,7 +478,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='23/11 · logo 2';
+var VERSION='23/11 · anneaux gris';
 // version du script (Code.gs, VERSION_SERVEUR) dont cette page a besoin : à changer seulement quand Code.gs change
 var SCRIPT_MIN='23/11 · détail planif';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)

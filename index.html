@@ -160,9 +160,17 @@
 [data-style="bento"] .bars.sem .bar-col span,[data-style="bento"] .bar-col span{font-family:var(--body)}
 /* ---------- style « Anneaux » (17/11/2026, 3e choix à l'essai, idée G) : pas de boîtes, des listes épurées séparées par des filets,
    des anneaux de la semaine en haut de l'Accueil (anneauxCard), titres en écriture normale (pas de majuscules), chiffres étroits */
-[data-style="anneaux"]{--display:'IBM Plex Sans','Segoe UI',system-ui,sans-serif}
-[data-style="anneaux"] h1.title{font-weight:600; font-size:26px; letter-spacing:-.4px}
-[data-style="anneaux"] h3{font-weight:600}
+/* 23/11/2026, à sa demande : Anneaux prend les polices de Bento (titres et chiffres en Barlow Condensed, titres de page en capitales ;
+   en thème GnB, titres de page en Saira italique comme en Bento). Avant : titres en IBM Plex Sans, écriture normale. */
+[data-style="anneaux"]{--display:'Barlow Condensed','Archivo','Helvetica Neue',Arial,sans-serif}
+[data-style="anneaux"] .sect h2{font-size:24px; text-transform:uppercase; letter-spacing:.3px}
+[data-style="anneaux"] h1.title{text-transform:uppercase; font-size:34px; letter-spacing:.2px; line-height:1}
+[data-style="anneaux"] h3{font-weight:700; font-size:19px!important; letter-spacing:.2px}
+[data-style="anneaux"] .big{font-size:48px; letter-spacing:-.5px}
+[data-style="anneaux"] .btn{font-family:var(--body)}
+[data-style="anneaux"] .num{font-size:19px}
+[data-style="anneaux"] .kpi b{font-size:30px}
+[data-style="anneaux"] .bars.sem .bar-col span,[data-style="anneaux"] .bar-col span{font-family:var(--body)}
 [data-style="anneaux"] .big,[data-style="anneaux"] .kpi b,[data-style="anneaux"] .anneau-c{font-family:'Barlow Condensed','Archivo',Arial,sans-serif; font-weight:800}
 /* 23/11/2026, à sa demande : chaque bloc garde la mise en page Anneaux mais sur un fond légèrement grisé (comme Bento), sans contour */
 [data-style="anneaux"]{--fond-anneaux:var(--surface); --fond-anneaux-2:var(--seg)}
@@ -222,8 +230,8 @@
 @media (prefers-reduced-motion:no-preference){.splash .lg-plein{animation:respire 1.8s ease-in-out infinite}}
 @keyframes respire{50%{opacity:.55}}
 /* thème GnB : titres en italique épais comme le logo, soulignés d'un trait rouge incliné */
-[data-theme="gnb"]:not([data-style="anneaux"]) h1.title{font-family:'Saira','Barlow Condensed',Arial,sans-serif; font-style:italic; font-weight:800; font-stretch:100%; letter-spacing:-.2px}
-[data-theme="gnb"][data-style="bento"] h1.title{font-size:30px; letter-spacing:0}
+[data-theme="gnb"] h1.title{font-family:'Saira','Barlow Condensed',Arial,sans-serif; font-style:italic; font-weight:800; font-stretch:100%; letter-spacing:-.2px}
+[data-theme="gnb"]:is([data-style="bento"],[data-style="anneaux"]) h1.title{font-size:30px; letter-spacing:0}
 [data-theme="gnb"] h1.title::after{content:""; display:block; width:38px; height:4px; margin-top:8px; background:linear-gradient(90deg,#E1161E,var(--rouge-logo)); transform:skewX(-24deg); transform-origin:left bottom}
 /* en-tête de l'Accueil et de la vue préparateur : le loup en filigrane à droite, lueur rouge */
 [data-theme="gnb"] .hero{position:relative; overflow:hidden; isolation:isolate; padding:14px 14px 16px; border-radius:8px;
@@ -474,7 +482,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='23/11 · rouge logo';
+var VERSION='23/11 · anneaux police bento';
 // version du script (Code.gs, VERSION_SERVEUR) dont cette page a besoin : à changer seulement quand Code.gs change
 var SCRIPT_MIN='23/11 · détail planif';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)

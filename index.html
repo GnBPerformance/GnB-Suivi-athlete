@@ -390,7 +390,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='17/11 · 3 styles';
+var VERSION='23/11 · biblio planif';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
 // thème par appareil : GnB (noir, rouge, blanc, par défaut depuis le 17/11/2026), Clair ou Galaxie
 function themeValide(t){return t==='light'||t==='galaxie'?t:'gnb'}
@@ -687,6 +687,16 @@ function typesCard(se,pourAthlete){
 // ---------- onglet Saison : périodisation écrite par le préparateur (onglet « Périodisation » du Sheet)
 function cleMacro(t){t=String(t||'').toLowerCase(); return /g[ée]n[ée]ral/.test(t)?'gen':/sp[ée]cif/.test(t)?'spe':/comp[ée]t/.test(t)?'comp':/transit/.test(t)?'trans':'autre'}
 function cleType(t){t=String(t||'').toLowerCase(); return /d[ée]velop/.test(t)?'dev':/choc/.test(t)?'choc':/r[ée]cup/.test(t)?'recup':/aff[ûu]t/.test(t)?'aff':/comp[ée]t/.test(t)?'comp':/maint/.test(t)?'maint':'vide'}
+// bibliothèque de planification du Sheet (onglet « Bibliothèque planif ») : couleur choisie par le préparateur, initiale, description.
+// Sans couleur reçue (cycle d'origine jamais recoloré), l'app garde ses couleurs adaptées au thème.
+var INIT_T={dev:'D',choc:'C',recup:'R',aff:'A',comp:'Co',maint:'M',vide:''};
+function bpE(niv,nom){var b=S.saison&&S.saison.biblio; return (nom&&b&&b[niv]&&b[niv][nom])||null}
+function coulOk(c){return /^#[0-9a-fA-F]{3,8}$/.test(String(c||''))}
+function bgType(t){var e=bpE('type',t); return e&&coulOk(e.bg)?'background:'+e.bg+';':''}
+function stType(t){var e=bpE('type',t); return e&&coulOk(e.bg)?' style="background:'+e.bg+(coulOk(e.fg)?';color:'+e.fg:'')+'"':''}
+function initType(t){var e=bpE('type',t); return e&&e.i?String(e.i).slice(0,3):(INIT_T[cleType(t)]||(t?String(t).charAt(0).toUpperCase():''))}
+function stMac(t){var e=bpE('macro',t); return e&&coulOk(e.bg)?'background:'+e.bg+(coulOk(e.fg)?';color:'+e.fg:''):''}
+function coulMeso(meso,macro){var e=bpE('meso',meso); if(e&&coulOk(e.bg))return e.bg; var m=bpE('macro',macro); return m&&coulOk(m.bg)?m.bg:'var(--mac-'+cleMacro(macro)+'-fg)'}
 function suites(w,k){var o=[]; w.forEach(function(s,i){var v=s[k]||'', l=o[o.length-1]; if(l&&l.v===v)l.fin=i; else o.push({v:v,deb:i,fin:i})}); return o}
 // UA réellement faites par semaine (clé = lundi), à partir des séances déjà reçues (Sheet + app) : aucun appel en plus
 function uaParSemaine(){var o={}; S.mySeances.forEach(function(s){var d=parseKey(s.date), L=load(s); if(!d||L==null)return; var k=key(addDays(d,-((d.getDay()+6)%7))); o[k]=(o[k]||0)+L}); return o}
@@ -700,9 +710,10 @@ function athSaison(){
   var avant=t<parseKey(w[0].lundi), fini=ci<0&&!avant, ref=ci>=0?ci:(avant?0:w.length-1), c=w[ref], d0=parseKey(c.lundi);
   var nx=-1; if(!fini)for(var i=(avant?0:ci);i<w.length;i++){if(w[i].evt){nx=i;break}}
   var tete= avant?'Ta planification commence le '+fmtDate(parseKey(w[0].lundi)) : fini?'Planification terminée · dernière semaine '+esc(c.sem) : 'Cette semaine · '+esc(c.sem)+' · '+fmtDate(d0)+' → '+fmtDate(addDays(d0,6));
-  var carte='<div class="card stack" style="gap:8px'+(ci>=0?';border-color:var(--accent)':'')+'"><div class="row between"><span class="tiny muted">'+tete+'</span>'+(c.type?'<span class="pill mt mt-'+cleType(c.type)+'">'+esc(c.type)+'</span>':'')+'</div>'+
+  var carte='<div class="card stack" style="gap:8px'+(ci>=0?';border-color:var(--accent)':'')+'"><div class="row between"><span class="tiny muted">'+tete+'</span>'+(c.type?'<span class="pill mt mt-'+cleType(c.type)+'"'+stType(c.type)+'>'+esc(c.type)+'</span>':'')+'</div>'+
     '<div><div style="font-family:var(--display);font-weight:800;font-size:19px">'+esc(c.meso||c.macro||'Planification')+'</div>'+(c.meso&&c.macro?'<div class="small muted">'+esc(c.macro)+'</div>':'')+'</div>'+
     ((c.obj1||c.obj2)?'<div class="small">Objectifs : '+esc([c.obj1,c.obj2].filter(function(x){return x}).join(' · '))+'</div>':'')+
+    [['type',c.type],['meso',c.meso],['macro',c.macro]].map(function(x){var e=bpE(x[0],x[1]); return e&&e.d?'<div class="small"><b>'+esc(x[1])+'</b> : '+esc(e.d)+'</div>':''}).join('')+
     (c.charge?'<div class="row between small"><span class="muted">Charge prévue</span><span class="dots">'+'●'.repeat(Math.min(5,c.charge))+'<span>'+'●'.repeat(Math.max(0,5-c.charge))+'</span></span></div>':'')+
     (c.seances?'<div class="row between small"><span class="muted">Séances prévues</span><b>'+c.seances+'</b></div>':'')+
     (ci>=0?'<div class="row between small"><span class="muted">Déjà fait cette semaine</span><b>'+fmtN(uaParSemaine()[c.lundi]||0)+' UA</b></div>':'')+
@@ -711,32 +722,31 @@ function athSaison(){
   // frise façon « plan annuel » : mois, macrocycles, mésocycles, puis une colonne par semaine :
   // semaines à venir = case du type prévu (initiale) ; semaines passées et en cours = barre des UA réellement faites (durée × RPE)
   var UA=uaParSemaine(), uaMax=1; w.forEach(function(s,i){if(i<=ci||fini)uaMax=Math.max(uaMax,UA[s.lundi]||0)});
-  var INIT={dev:'D',choc:'C',recup:'R',aff:'A',comp:'Co',maint:'M',vide:''};
   var P=30, MOIS=['Janv.','Févr.','Mars','Avr.','Mai','Juin','Juil.','Août','Sept.','Oct.','Nov.','Déc.'];
   var bande=function(r,cls,style){var n=r.fin-r.deb+1; return '<div class="'+cls+'" style="width:'+(n*P-3)+'px;'+(style||'')+'" title="'+esc(r.v)+'"><span style="overflow:hidden;text-overflow:ellipsis">'+esc(r.v)+'</span></div>'};
   var mois=[]; w.forEach(function(s,i){var m=s.lundi.slice(0,7), l=mois[mois.length-1]; if(l&&l.v===m)l.fin=i; else mois.push({v:m,deb:i,fin:i})});
   var frise='<div class="card"><div class="row between"><h3 style="font-size:16px">Vue d\'ensemble</h3><span class="tiny muted">'+w.length+' semaines</span></div>'+
     '<div class="frise" data-ci="'+ref+'"><div style="width:'+(w.length*P)+'px">'+
     '<div class="fr-ligne fr-mois">'+mois.map(function(r){return '<div style="width:'+((r.fin-r.deb+1)*P)+'px">'+(r.fin-r.deb>=1?MOIS[+r.v.slice(5,7)-1]:'')+'</div>'}).join('')+'</div>'+
-    '<div class="fr-ligne fr-mac">'+suites(w,'macro').map(function(r){return r.v?bande(r,'mac-'+cleMacro(r.v)):'<div style="width:'+((r.fin-r.deb+1)*P)+'px"></div>'}).join('')+'</div>'+
-    (!w.some(function(s){return s.meso})?'':'<div class="fr-ligne fr-meso">'+suites(w,'meso').map(function(r){return r.v?bande(r,'','border-left-color:var(--mac-'+cleMacro(w[r.deb].macro)+'-fg)'):'<div style="width:'+((r.fin-r.deb+1)*P)+'px;border:none"></div>'}).join('')+'</div>')+
+    '<div class="fr-ligne fr-mac">'+suites(w,'macro').map(function(r){return r.v?bande(r,'mac-'+cleMacro(r.v),stMac(r.v)):'<div style="width:'+((r.fin-r.deb+1)*P)+'px"></div>'}).join('')+'</div>'+
+    (!w.some(function(s){return s.meso})?'':'<div class="fr-ligne fr-meso">'+suites(w,'meso').map(function(r){return r.v?bande(r,'','border-left-color:'+coulMeso(r.v,w[r.deb].macro)):'<div style="width:'+((r.fin-r.deb+1)*P)+'px;border:none"></div>'}).join('')+'</div>')+
     '<div class="fr-ligne fr-barres">'+w.map(function(s,i){var k=cleType(s.type), fait=fini||i<=ci, ua=UA[s.lundi]||0;
-      var corps=fait?'<span class="ua">'+uaCourt(ua)+'</span><div class="b mt-'+k+'" style="height:'+(ua?8+Math.round(ua/uaMax*54):3)+'px"></div>'
-                    :'<div class="t mt-'+k+'">'+INIT[k]+'</div>';
+      var corps=fait?'<span class="ua">'+uaCourt(ua)+'</span><div class="b mt-'+k+'" style="'+bgType(s.type)+'height:'+(ua?8+Math.round(ua/uaMax*54):3)+'px"></div>'
+                    :'<div class="t mt-'+k+'"'+stType(s.type)+'>'+esc(initType(s.type))+'</div>';
       return '<div class="'+(i===ci?'cur':'')+'" title="'+esc('S'+(s.n||i+1)+' · '+fmtDate(parseKey(s.lundi))+(s.type?' · '+s.type:'')+(fait?' · '+fmtN(ua)+' UA faites':'')+(s.evt?' · '+s.evt:''))+'">'+
         (i===ci?'<span class="auj">auj.</span>':'')+(s.evt?'<span class="f">▲</span>':'')+corps+'</div>'}).join('')+'</div>'+
     '<div class="fr-ligne fr-dates">'+w.map(function(s,i){return '<div'+(i===ci?' class="cur"':'')+'><b>S'+(s.n||i+1)+'</b><br>'+fmtDate(parseKey(s.lundi))+'</div>'}).join('')+'</div>'+
     '</div></div>'+
-    '<div class="legend" style="margin-top:12px">'+[['dev','Développement'],['choc','Choc'],['recup','Récupération'],['aff','Affûtage'],['comp','Compétition'],['maint','Maintien']].filter(function(x){return w.some(function(s){return cleType(s.type)===x[0]})}).map(function(x){return '<span><span class="dot mt-'+x[0]+'"></span>'+INIT[x[0]]+' · '+x[1]+'</span>'}).join('')+(w.some(function(s){return s.evt})?'<span><span style="color:var(--alert-bg)">▲</span> compétition</span>':'')+'</div>'+
+    '<div class="legend" style="margin-top:12px">'+w.map(function(s){return s.type}).filter(function(x,i,a){return x&&a.indexOf(x)===i}).map(function(x){return '<span><span class="dot mt-'+cleType(x)+'" style="'+bgType(x)+'"></span>'+esc(initType(x))+' · '+esc(x)+'</span>'}).join('')+(w.some(function(s){return s.evt})?'<span><span style="color:var(--alert-bg)">▲</span> compétition</span>':'')+'</div>'+
     '<p class="tiny muted" style="margin:8px 0 0">1 colonne = 1 semaine (S1 = 1re semaine, date de son lundi). Semaines passées : la barre montre les UA réellement faites. Semaines à venir : le type de semaine prévu. '+(w.length>9?'Glisse la frise pour tout voir.':'')+'</p></div>';
   // les prochaines semaines, en clair
   var dep=avant?0:fini?w.length:ci+1, pro=w.slice(dep,dep+4);
   var proch=pro.length?'<div class="card" style="padding:4px 16px"><h3 style="font-size:16px;padding:12px 0 4px">Les prochaines semaines</h3>'+pro.map(function(s){var d=parseKey(s.lundi);
-      return '<div class="sem-row"><span class="barre mt-'+cleType(s.type)+'"></span><div style="flex:1;min-width:0"><div style="font-weight:600">Semaine du '+fmtDate(d)+'</div><div class="tiny muted">'+esc([s.meso,s.type].filter(function(x){return x}).join(' · ')||'—')+'</div>'+
+      return '<div class="sem-row"><span class="barre mt-'+cleType(s.type)+'" style="'+bgType(s.type)+'"></span><div style="flex:1;min-width:0"><div style="font-weight:600">Semaine du '+fmtDate(d)+'</div><div class="tiny muted">'+esc([s.meso,s.type].filter(function(x){return x}).join(' · ')||'—')+'</div>'+
         (s.evt?'<div class="tiny" style="color:var(--alert-bg);font-weight:600;margin-top:2px">▲ '+esc(s.evt)+'</div>':'')+'</div>'+(s.charge?'<span class="dots" title="Charge prévue">'+'●'.repeat(Math.min(5,s.charge))+'<span>'+'●'.repeat(Math.max(0,5-s.charge))+'</span></span>':'')+'</div>'}).join('')+'</div>':'';
   var mesos=suites(w,'meso').filter(function(r){return r.v});
   var liste=mesos.length?'<div class="card" style="padding:4px 16px"><h3 style="font-size:16px;padding:12px 0 4px">Mes mésocycles</h3>'+mesos.map(function(r){var s=w[r.deb], st=avant?'À venir':fini||r.fin<ci?'Terminé':r.deb<=ci?'En cours':'À venir';
-      return '<div class="meso" style="border-left-color:var(--mac-'+cleMacro(s.macro)+'-fg)"><div><div style="font-weight:600">'+esc(r.v)+'</div><div class="tiny muted">'+fmtDate(parseKey(s.lundi))+' → '+fmtDate(addDays(parseKey(w[r.fin].lundi),6))+((s.obj1||s.obj2)?' · '+esc([s.obj1,s.obj2].filter(function(x){return x}).join(', ')):'')+'</div></div>'+
+      return '<div class="meso" style="border-left-color:'+coulMeso(r.v,s.macro)+'"><div><div style="font-weight:600">'+esc(r.v)+'</div><div class="tiny muted">'+fmtDate(parseKey(s.lundi))+' → '+fmtDate(addDays(parseKey(w[r.fin].lundi),6))+((s.obj1||s.obj2)?' · '+esc([s.obj1,s.obj2].filter(function(x){return x}).join(', ')):'')+'</div></div>'+
         '<span class="pill '+(st==='En cours'?'s-ok':'s-na')+'">'+st+'</span></div>'}).join('')+'</div>':'';
   var comps=w.map(function(s,i){return {s:s,i:i}}).filter(function(x){return x.s.evt});
   var lc=comps.length?'<div class="card" style="padding:4px 16px"><h3 style="font-size:16px;padding:12px 0 4px">Compétitions et tests</h3>'+comps.map(function(x){var passe=!avant&&(fini||x.i<ci);

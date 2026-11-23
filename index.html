@@ -82,9 +82,9 @@
   --accent:#E1161E; --on-accent:#FFFFFF; --link:#FF5A5F;
   --block:#18181B; --on-block:#FFFFFF; --on-block-muted:#B4B4BB; --seg:#1C1C1F; --bar-past:#3F3F46;
   --ok-bg:#26262A; --ok-fg:#F4F4F5; --warn-bg:#3A2A0E; --warn-fg:#FFC861;
-  --alert-bg:#E8590C; --alert-fg:#FFFFFF; --na-bg:#1C1C1F; --na-fg:#B4B4BB;
+  --alert-bg:#A51C24; --alert-fg:#FFFFFF; --na-bg:#1C1C1F; --na-fg:#B4B4BB;   /* alertes au rouge du logo (23/11/2026, à sa demande ; avant : orange) */
   --hl:#FF5A5F;
-  --f-ok:#3FBF86; --f-warn:#F5B83D; --f-alert:#F0702B; --f-na:#52525B;
+  --f-ok:#3FBF86; --f-warn:#F5B83D; --f-alert:#D3232D; --f-na:#52525B;
   --ty-1:#E1161E; --ty-2:#E4E4E7; --ty-3:#F5B83D; --ty-4:#52525B;
   --ph-ech-c:#F0702B; --ph-ech-bg:rgba(240,112,43,.10); --ph-corps-c:#E1161E; --ph-corps-bg:rgba(225,22,30,.10); --ph-calme-c:#3FBF86; --ph-calme-bg:rgba(63,191,134,.10);
   --grad:linear-gradient(135deg,#B3121A 0%,#E1161E 100%);
@@ -106,8 +106,9 @@
 [data-theme="gnb"] .kpi{background:rgba(255,255,255,.05)}
 /* ---------- bandeau du haut (nom GnB Performance), fixe en haut de l'écran */
 .topbar{position:sticky; top:0; z-index:6; background:var(--bg); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px)}
-[data-theme="gnb"] .topbar{background:rgba(10,10,11,.94); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
-:is([data-theme="galaxie"]) .topbar{background:rgba(9,7,16,.9); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
+/* bandeau opaque : s'il laisse voir la page en transparence, le fond noir du logo réapparaît en rectangle quand on fait défiler */
+[data-theme="gnb"] .topbar{background:#0A0A0B}
+:is([data-theme="galaxie"]) .topbar{background:#090710}
 .topbar .in{max-width:1080px; margin:0 auto; height:82px; padding:0 20px; display:flex; align-items:center; justify-content:space-between; gap:12px}
 .topbar .role{font-size:12px; color:var(--muted); white-space:nowrap}
 .topbar .actu{background:none; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:5px 10px; font:inherit; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap} .topbar .actu:disabled{opacity:.6; cursor:default}
@@ -168,7 +169,7 @@
 [data-style="anneaux"][data-theme="gnb"]{--fond-anneaux:#16161A; --fond-anneaux-2:#1E1E23}
 [data-style="anneaux"] .card,[data-style="anneaux"] .item,[data-style="anneaux"] details.prog,[data-style="anneaux"] details.mois,[data-style="anneaux"] .card.block,[data-style="anneaux"] .coachhead{background:var(--fond-anneaux)!important; border:none!important; border-radius:12px!important; box-shadow:none!important}
 [data-style="anneaux"] .card details.prog,[data-style="anneaux"] details.mois details.prog{background:var(--fond-anneaux-2)!important}
-[data-style="anneaux"] .card.carte-ech{background:#E24B4A!important; color:#FFFFFF}   /* carte des échéances : rouge, comme dans les autres styles */
+[data-style="anneaux"] .card.carte-ech{background:var(--rouge-logo)!important; color:#FFFFFF}   /* carte des échéances : rouge, comme dans les autres styles */
 [data-style="anneaux"] .card.block,[data-style="anneaux"] .coachhead{color:var(--ink)}
 [data-style="anneaux"] .card.block .muted,[data-style="anneaux"] .coachhead .tiny,[data-style="anneaux"] .coachhead .small{color:var(--muted)!important}
 [data-style="anneaux"] .coachhead h1.title{color:var(--ink)!important}
@@ -191,7 +192,10 @@
    Un seul fichier, logo.webp (1024 × 572, fond noir), découpé par CSS : --x, --y, --w, --h = zone gardée dans l'image d'origine, --s = échelle.
    Sur fond sombre, mix-blend-mode:lighten fond le noir du logo dans le fond de l'app (pas de rectangle visible).
    Hors GitHub (ancien lien Google), --logo est remplacé par l'adresse complète du logo sur GitHub (voir CHEZ_GOOGLE). */
-:root{--logo:url("logo.webp"); --rouge-logo:#A51C24}
+/* rouge du logo (mesuré sur l'image) : fonds des échéances et des alertes. --rouge-logo-t = même teinte, plus lumineuse,
+   pour les petits repères et textes rouges sur fond sombre (▲, « Examens »…), sinon trop sombres pour être lus */
+:root{--logo:url("logo.webp"); --rouge-logo:#A51C24; --rouge-logo-t:#A51C24}
+:root:is([data-theme="gnb"],[data-theme="galaxie"]){--rouge-logo-t:#D3232D}
 .lg-plein,[data-theme="gnb"] :is(.hero,.coachhead)::after{
   width:calc(var(--w) * var(--s) * 1px); height:calc(var(--h) * var(--s) * 1px);
   background:var(--logo) no-repeat; background-size:calc(1024px * var(--s)) auto;
@@ -299,7 +303,7 @@ h1.title{font-weight:800; font-size:28px; letter-spacing:-0.5px}
 .num{height:46px; border-radius:10px; border:1px solid var(--line); background:var(--surface); font-family:var(--display); font-weight:700; font-size:16px}
 .num[aria-pressed="true"]{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
 label.lab{font-size:13px; font-weight:600; color:var(--muted); display:block; margin-bottom:6px}
-.field{height:48px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface); padding:0 14px; font-size:15px}
+.field{height:48px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface); padding:0 14px; font-size:16px}   /* 16 px : en dessous, l'iPhone zoome tout l'écran quand on touche le champ */
 textarea.field{height:74px; padding:12px 14px; resize:none}
 .two{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
 .seg{background:var(--seg); border-radius:12px; padding:4px; display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:4px}
@@ -417,7 +421,7 @@ details.mois details.prog{background:var(--bg)}
 .pa td[colspan]{text-align:left; font-weight:700} .pa-mois{color:var(--ink)}
 .pa-sem b{display:block; font-size:11px} .pa-sem span{display:block; font-size:9px; color:var(--muted)}
 .pa td.cur{background:var(--ok-bg); box-shadow:inset 2px 0 var(--accent),inset -2px 0 var(--accent)}
-.pa-ech{background:#E24B4A; color:#fff}
+.pa-ech{background:var(--rouge-logo); color:#fff}
 .pa td[colspan]{overflow:visible} .pa-t{position:sticky; left:var(--pa-lab,104px); display:inline-block; max-width:100%; overflow:hidden; text-overflow:ellipsis; vertical-align:middle}
 .pa td.pa-ech:not([colspan]),.pa td.pa-ech[colspan="1"]{white-space:normal; line-height:1.1; font-size:9.5px; overflow:hidden} .pa-meso{border-left:3px solid var(--line); font-weight:600!important} .pa-obj{color:var(--muted); font-weight:600!important}
 .pa-type{display:inline-flex; width:30px; height:20px; border-radius:5px; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:10px}
@@ -428,11 +432,11 @@ details.mois details.prog{background:var(--bg)}
 .pd-mac{border-radius:8px; padding:8px 10px; display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap; margin-bottom:4px}
 .pd-meso{border-left:3px solid var(--line); padding:6px 0 2px 8px; margin-top:10px; font-size:14px} .pd-sem{border-top:1px solid var(--line); padding:9px 0}
 .pd-sem.cur{background:var(--ok-bg); margin:0 -8px; padding:9px 8px; border-radius:8px; border-top-color:transparent} .pd-sem.passe{opacity:.7}
-.pd-ech{color:#E24B4A; font-weight:700; font-size:14px; margin-top:4px} .pd-infos{color:var(--muted); margin-top:3px} .pd-note{margin-top:5px; font-size:13px; background:var(--ok-bg); color:var(--ok-fg); border-radius:6px; padding:5px 8px}
+.pd-ech{color:var(--rouge-logo-t); font-weight:700; font-size:14px; margin-top:4px} .pd-infos{color:var(--muted); margin-top:3px} .pd-note{margin-top:5px; font-size:13px; background:var(--ok-bg); color:var(--ok-fg); border-radius:6px; padding:5px 8px}
 .pg-wrap{position:relative; padding:3px 0} .pg-barre{display:flex; gap:2px; height:14px; border-radius:7px; overflow:hidden}
 .pg-barre span{display:block; height:100%; min-width:2px} .pg-auj{position:absolute; top:0; bottom:0; width:3px; border-radius:2px; background:var(--ink); transform:translateX(-1px)}
-.pg-marques{position:relative; height:12px} .pg-marques i{position:absolute; top:0; transform:translateX(-50%); font-style:normal; font-size:10px; line-height:1; color:#E24B4A}
-.pg-bloc{border-top:1px solid var(--line); padding-top:10px} .pg-sous{padding:6px 0 0 18px; font-size:14px} .pg-ech b{color:#E24B4A}
+.pg-marques{position:relative; height:12px} .pg-marques i{position:absolute; top:0; transform:translateX(-50%); font-style:normal; font-size:10px; line-height:1; color:var(--rouge-logo-t)}
+.pg-bloc{border-top:1px solid var(--line); padding-top:10px} .pg-sous{padding:6px 0 0 18px; font-size:14px} .pg-ech b{color:var(--rouge-logo-t)}
 .carte-ech{gap:4px; text-align:left; width:100%; border:0; cursor:pointer; font:inherit; font-size:15px}
 .sem-row .barre{width:4px; align-self:stretch; border-radius:2px; flex:none}
 .meso{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 0 11px 10px; border-bottom:1px solid var(--line); border-left:4px solid var(--line)}
@@ -470,7 +474,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='23/11 · logo exact';
+var VERSION='23/11 · rouge logo';
 // version du script (Code.gs, VERSION_SERVEUR) dont cette page a besoin : à changer seulement quand Code.gs change
 var SCRIPT_MIN='23/11 · détail planif';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
@@ -502,7 +506,8 @@ if(!CHEZ_GOOGLE){
   if('serviceWorker' in navigator){
     // nouvelle version de la mémoire du téléphone (sw.js) installée pendant l'ouverture : on recharge une fois, pour afficher tout de suite la version à jour
     var avaitUnSW=!!navigator.serviceWorker.controller, recharge=false;
-    navigator.serviceWorker.addEventListener('controllerchange',function(){if(avaitUnSW&&!recharge){recharge=true; location.reload()}});
+    // jamais pendant une saisie : le rechargement fermerait le clavier et effacerait ce qui est tapé (la nouvelle version s'affichera à l'ouverture suivante)
+    navigator.serviceWorker.addEventListener('controllerchange',function(){var ae=document.activeElement; if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))return; if(avaitUnSW&&!recharge){recharge=true; location.reload()}});
     window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(function(){})})}
 }
 var S={mode:'loading',tab:'home',profile:null,mySeances:[],myWellness:[],roster:null,accounts:[],selected:null,
@@ -649,8 +654,15 @@ function athProgramme(){
 function myMetrics(){return metrics(S.mySeances,S.myWellness,today())}
 // ---------- installation sur l'écran d'accueil : seule façon d'avoir l'app en plein écran, sans barre du navigateur
 var INSTALL={prompt:null};
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault(); INSTALL.prompt=e; render()});   // Android / Chrome / Edge
-window.addEventListener('appinstalled',function(){INSTALL.prompt=null; store('suivi_install_masque',String(Date.now())); render()});
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault(); INSTALL.prompt=e; majBandeauInstall()});   // Android / Chrome / Edge
+window.addEventListener('appinstalled',function(){INSTALL.prompt=null; store('suivi_install_masque',String(Date.now())); majBandeauInstall()});
+// Chrome peut annoncer l'installation à n'importe quel moment, y compris pendant que l'on tape son code : on ne refait que le bandeau,
+// jamais tout l'écran (tout refaire fermait le clavier du téléphone et effaçait le code tapé). Sur l'écran de code, le bandeau est sous le bouton.
+function majBandeauInstall(){
+  var w=app.querySelector('.wrap'), old=app.querySelector('.card.install'), h=bandeauInstall();
+  if(old){if(h)old.outerHTML=h; else old.remove()}
+  else if(h&&w)w.insertAdjacentHTML(S.mode==='login'?'beforeend':'afterbegin',h);
+}
 function estInstallee(){return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true}
 function bandeauInstall(){
   if(CHEZ_GOOGLE||estInstallee())return '';
@@ -781,7 +793,7 @@ function stType(t){var e=bpE('type',t); return e&&coulOk(e.bg)?' style="backgrou
 function initType(t){var e=bpE('type',t); return e&&e.i?String(e.i).slice(0,3):(INIT_T[cleType(t)]||(t?String(t).charAt(0).toUpperCase():''))}
 function stMac(t){var e=bpE('macro',t); return e&&coulOk(e.bg)?'background:'+e.bg+(coulOk(e.fg)?';color:'+e.fg:''):''}
 // échéances (compétition, test, stage… écrits par le préparateur) : toutes en rouge, comme dans le Sheet
-function stStage(){return 'background:#E24B4A;color:#fff;'}
+function stStage(){return 'background:var(--rouge-logo);color:#fff;'}   // rouge du logo
 function coulMeso(meso,macro){var e=bpE('meso',meso); if(e&&coulOk(e.bg))return e.bg; var m=bpE('macro',macro); return m&&coulOk(m.bg)?m.bg:'var(--mac-'+cleMacro(macro)+'-fg)'}
 function suites(w,k){var o=[]; w.forEach(function(s,i){var v=s[k]||'', l=o[o.length-1]; if(l&&l.v===v)l.fin=i; else o.push({v:v,deb:i,fin:i})}); return o}
 // UA réellement faites par semaine (clé = lundi), à partir des séances déjà reçues (Sheet + app) : aucun appel en plus
@@ -824,7 +836,7 @@ function athSaison(){
       var corps=fait?'<span class="ua">'+uaCourt(ua)+'</span><div class="b mt-'+k+'" style="'+bgType(s.type)+'height:'+(ua?8+Math.round(ua/uaMax*54):3)+'px"></div>'
                     :'<div class="t mt-'+k+'"'+stType(s.type)+'>'+esc(initType(s.type))+'</div>';
       return '<div class="'+(i===ci?'cur':'')+'" title="'+esc('S'+(s.n||i+1)+' · '+fmtDate(parseKey(s.lundi))+(s.type?' · '+s.type:'')+(fait?' · '+fmtN(ua)+' UA faites':'')+(s.stage?' · '+s.stage:''))+'">'+
-        (i===ci?'<span class="auj">auj.</span>':'')+(s.stage&&(i===0||w[i-1].stage!==s.stage)?'<span class="f" style="color:#E24B4A">▲</span>':'')+corps+'</div>'}).join('')+'</div>'+
+        (i===ci?'<span class="auj">auj.</span>':'')+(s.stage&&(i===0||w[i-1].stage!==s.stage)?'<span class="f" style="color:var(--rouge-logo-t)">▲</span>':'')+corps+'</div>'}).join('')+'</div>'+
     '<div class="fr-ligne fr-dates">'+w.map(function(s,i){return '<div'+(i===ci?' class="cur"':'')+'><b>S'+(s.n||i+1)+'</b><br>'+fmtDate(parseKey(s.lundi))+'</div>'}).join('')+'</div>'+
     '</div></div>'+
     '<div class="legend" style="margin-top:12px">'+w.map(function(s){return s.type}).filter(function(x,i,a){return x&&a.indexOf(x)===i}).map(function(x){return '<span><span class="dot mt-'+cleType(x)+'" style="'+bgType(x)+'"></span>'+esc(initType(x))+' · '+esc(x)+'</span>'}).join('')+(w.some(function(s){return s.stage})?'<span><span class="dot" style="'+stStage()+'"></span>▲ échéance</span>':'')+'</div>'+
@@ -842,7 +854,7 @@ function athSaison(){
   var ech=suites(w,'stage').filter(function(r){return r.v});
   var echPassee=function(r){return !avant&&(fini||r.fin<ci)}, echA=ech.filter(function(r){return !echPassee(r)}), echP=ech.filter(echPassee).reverse();
   var ligneEch=function(r){var s=w[r.deb], passe=echPassee(r), enc=!avant&&!fini&&r.deb<=ci&&r.fin>=ci;
-      return '<div class="meso" style="border-left-color:#E24B4A"><div><div style="font-weight:600">'+esc(r.v)+'</div><div class="tiny muted">'+fmtDate(parseKey(s.lundi))+' → '+fmtDate(addDays(parseKey(w[r.fin].lundi),6))+'</div></div><span class="pill '+(enc?'s-ok':passe?'s-na':'s-warn')+'">'+(enc?'En cours':passe?'Passé':dansSem(Math.round(diffDays(parseKey(s.lundi),lun)/7)))+'</span></div>'};
+      return '<div class="meso" style="border-left-color:var(--rouge-logo)"><div><div style="font-weight:600">'+esc(r.v)+'</div><div class="tiny muted">'+fmtDate(parseKey(s.lundi))+' → '+fmtDate(addDays(parseKey(w[r.fin].lundi),6))+'</div></div><span class="pill '+(enc?'s-ok':passe?'s-na':'s-warn')+'">'+(enc?'En cours':passe?'Passé':dansSem(Math.round(diffDays(parseKey(s.lundi),lun)/7)))+'</span></div>'};
   // les échéances passées ne restent pas dans la liste : elles sont rangées à part, repliées
   var le=ech.length?'<div class="card" style="padding:4px 16px"><h3 style="font-size:16px;padding:12px 0 4px">Mes échéances</h3>'+(echA.length?echA.map(ligneEch).join(''):'<p class="small muted" style="margin:4px 0 10px">Aucune échéance à venir.</p>')+
     (echP.length?'<details class="ech-passees"><summary>Échéances passées ('+echP.length+')</summary>'+echP.map(ligneEch).join('')+'</details>':'')+'</div>':'';
@@ -903,7 +915,7 @@ function planDetail(w,ci,avant,fini){
       (s.stage?'<div class="pd-ech">▲ '+esc(s.stage)+'</div>':'')+(infos.length?'<div class="pd-infos tiny">'+infos.join(' · ')+'</div>':'')+(s.note?'<div class="pd-note">'+esc(s.note)+'</div>':'')+'</div>'};
   var mois=groupes.map(function(g,k){var y=g.m.slice(0,4), mo=+g.m.slice(5,7)-1, dern=g.i[g.i.length-1], passe=!avant&&(fini||dern<ci);
     var ouvert=g.i.indexOf(ci)>=0||(avant&&k===0)||(fini&&k===groupes.length-1), nbE=g.i.filter(function(i){return w[i].stage}).length;
-    return '<details class="pd-mois"'+(ouvert?' open':'')+'><summary><span><b>'+MOIS_LONG[mo]+' '+y+'</b></span><span class="tiny muted">'+g.i.length+' sem.'+(nbE?' · <span style="color:#E24B4A;font-weight:700">'+nbE+' ▲</span>':'')+(passe?' · passé':g.i.indexOf(ci)>=0?' · en cours':'')+'</span></summary>'+g.i.map(ligneSem).join('')+'</details>'}).join('');
+    return '<details class="pd-mois"'+(ouvert?' open':'')+'><summary><span><b>'+MOIS_LONG[mo]+' '+y+'</b></span><span class="tiny muted">'+g.i.length+' sem.'+(nbE?' · <span style="color:var(--rouge-logo-t);font-weight:700">'+nbE+' ▲</span>':'')+(passe?' · passé':g.i.indexOf(ci)>=0?' · en cours':'')+'</span></summary>'+g.i.map(ligneSem).join('')+'</details>'}).join('');
   return '<div class="wrap stack"><div class="row" style="gap:10px;align-items:center"><button class="btn ghost" style="width:44px;padding:0;border-radius:22px;flex:none" data-act="planDetail" data-v="0" aria-label="Retour">'+I.back+'</button><div><div class="small muted">Du '+fmtDate(parseKey(w[0].lundi))+' au '+fmtDate(addDays(parseKey(w[n-1].lundi),6))+' · '+n+' semaines</div><h1 class="title" style="font-size:24px">Toute ma planification</h1></div></div>'+
     reperes+sur('Tableau annuel',function(){return tableauAnnuel(w,ci,avant,fini,UA)})+
     '<div class="card" style="padding:6px 14px"><div class="row between" style="padding:8px 0 4px"><h3 style="font-size:16px">Semaine par semaine</h3>'+(ci>=0?'<button class="btn ghost" data-act="planAuj" style="padding:5px 10px;font-size:12px">Cette semaine</button>':'')+'</div>'+mois+'</div>'+
@@ -1368,12 +1380,12 @@ function mensuelCard(r){
        (x.comment?'<div class="small" style="white-space:pre-wrap">« '+esc(x.comment)+' »</div>':'')+'</div>'}).join('')
      :'<p class="small muted" style="margin:0">Aucun bilan envoyé pour l\'instant. L\'athlète voit la carte « Bilan du mois » sur son Accueil.</p>')+'</div>'}
 function loginView(){
-  return '<div class="wrap stack login" style="max-width:420px;padding-top:calc(48px + env(safe-area-inset-top,0px))">'+bandeauInstall()+
+  return '<div class="wrap stack login" style="max-width:420px;padding-top:calc(48px + env(safe-area-inset-top,0px))">'+
   '<div class="login-logo" role="img" aria-label="GnB Performance"><i class="lg-plein"></i></div>'+
   '<h1 class="title">Suivi des athlètes</h1><p class="muted" style="margin:0">Entre le code d\'accès que t\'a donné ton préparateur. Il sera mémorisé sur cet appareil.</p>'+
-  '<div><label class="lab" for="lg-code">Code d\'accès</label><input id="lg-code" class="field" autocomplete="off" autocapitalize="none" spellcheck="false" value="'+esc(S.lg||'')+'"></div>'+
+  '<div><label class="lab" for="lg-code">Code d\'accès</label><input id="lg-code" class="field" type="text" inputmode="text" enterkeyhint="go" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" value="'+esc(S.lg||'')+'"></div>'+
   (S.error?'<div class="notice">'+esc(S.error)+'</div>':'')+
-  '<button class="btn primary full" data-act="login"'+(S.busy?' disabled':'')+'>Se connecter</button></div>';
+  '<button class="btn primary full" data-act="login"'+(S.busy?' disabled':'')+'>Se connecter</button>'+bandeauInstall()+'</div>';
 }
 function store(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}}
 function stored(k){try{return localStorage.getItem(k)}catch(e){return null}}
@@ -1515,7 +1527,8 @@ app.addEventListener('click',function(e){
 });
 app.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='lg-code'){var b=app.querySelector('[data-act="login"]'); if(b)b.click(); return} if(e.key==='Enter'){var tr=e.target.closest('tr[data-act]'); if(tr){tr.click()}}});
 app.addEventListener('input',function(e){var t=e.target;
-  if(t.id==='f-dur'){S.form.duree=t.value; var L=num(t.value)!=null?num(t.value)*S.form.rpe:null; var c=document.getElementById('f-charge'); if(c)c.textContent=(L!=null?fmtN(L):'–')+' UA'; var fo=document.getElementById('f-form'); if(fo)fo.textContent='RPE '+S.form.rpe+' × '+(t.value||'?')+' min'}
+  if(t.id==='lg-code')S.lg=t.value;   // le code tapé survit à un réaffichage de l'écran
+  else if(t.id==='f-dur'){S.form.duree=t.value; var L=num(t.value)!=null?num(t.value)*S.form.rpe:null; var c=document.getElementById('f-charge'); if(c)c.textContent=(L!=null?fmtN(L):'–')+' UA'; var fo=document.getElementById('f-form'); if(fo)fo.textContent='RPE '+S.form.rpe+' × '+(t.value||'?')+' min'}
   else if(t.id==='f-date')S.form.date=t.value;
   else if(t.id==='f-com')S.form.comment=t.value;
   else if(t.id==='f-int')S.form.intitule=t.value;

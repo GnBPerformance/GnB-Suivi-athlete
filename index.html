@@ -482,7 +482,7 @@ details.mois details.prog{background:var(--bg)}
 (function(){
 'use strict';
 var app=document.getElementById('app');
-var VERSION='25/11 · protocole';
+var VERSION='28/11 · ordre des séances';
 // version du script (Code.gs, VERSION_SERVEUR) dont cette page a besoin : à changer seulement quand Code.gs change
 var SCRIPT_MIN='25/11 · protocole';
 // thème choisi sur cet appareil : 'galaxie' (par défaut) ou 'light' (thème clair d'origine)
@@ -647,15 +647,18 @@ function progCorps(s){var blocs=s.blocs||[];
 function remplirSeance(d){var b=d&&d.querySelector('.body[data-attente]'), s=d&&SEANCES_PROG[d.getAttribute('data-id')]; if(b&&s&&d.open){b.innerHTML=progCorps(s); b.removeAttribute('data-attente')}}
 function moisLabel(m){var d=new Date(+m.slice(0,4),+m.slice(5,7)-1,1), t=d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); return t.charAt(0).toUpperCase()+t.slice(1)}
 function athProgramme(){
-  var p=progSorted(), toutes=p.fut.slice().reverse().concat(p.past), parMois={}, mois=[], cur=key(today()).slice(0,7);
+  // 28/11/2026 (capture d'Enzo) : dans un mois, séances dans l'ordre des dates (avant : les séances à venir de la plus lointaine à la plus proche) ;
+  // la prochaine séance, montrée en haut, n'est plus répétée dans la liste (avant : 8 séances visibles pour 7 dans le Sheet)
+  var p=progSorted(), proch=p.fut[0]||null, toutes=p.fut.slice(1).concat(p.past), parMois={}, mois=[], cur=key(today()).slice(0,7), moisProch=proch?String(proch.date).slice(0,7):'';
   SEANCES_PROG={};
   toutes.forEach(function(s){var m=String(s.date).slice(0,7); if(!parMois[m]){parMois[m]=[]; mois.push(m)} parMois[m].push(s)});
+  mois.forEach(function(m){parMois[m].sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0})});
   mois.sort(function(a,b){return a<b?1:-1});
   var ouvert=mois.indexOf(cur)>=0?cur:mois[0];
   return '<div class="wrap stack"><h1 class="title">'+(S.invite?'Programme':'Mon programme')+'</h1>'+
    (p.fut.length?'<h3 style="font-size:17px">Prochaine séance</h3>'+progCard(p.fut[0],true,'next'):'<div class="card small muted">Aucune séance programmée pour l\'instant. Ton préparateur l\'ajoutera ici.</div>')+
    (mois.length?'<h3 style="font-size:17px;margin-top:8px">Toutes mes séances</h3>'+mois.map(function(m){var l=parMois[m];
-     return '<details class="mois" data-id="m-'+m+'"'+(m===ouvert?' open':'')+'><summary><div><div style="font-family:var(--display);font-weight:700;font-size:16px">'+esc(moisLabel(m))+'</div><div class="tiny muted">'+l.length+' séance'+(l.length>1?'s':'')+'</div></div><span class="blue-t chev" aria-hidden="true">▾</span></summary>'+
+     return '<details class="mois" data-id="m-'+m+'"'+(m===ouvert?' open':'')+'><summary><div><div style="font-family:var(--display);font-weight:700;font-size:16px">'+esc(moisLabel(m))+'</div><div class="tiny muted">'+l.length+' séance'+(l.length>1?'s':'')+(m===moisProch?' + la prochaine, en haut':'')+'</div></div><span class="blue-t chev" aria-hidden="true">▾</span></summary>'+
        '<div class="mois-body">'+l.map(function(s){return progCard(s,false)}).join('')+'</div></details>'}).join(''):'')+
    '<p class="tiny muted">Les vidéos servent à te rappeler les exercices : suis d\'abord les consignes de ton préparateur.</p></div>';
 }
